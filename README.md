@@ -6,9 +6,6 @@ focus handling, and support for dynamic date ranges and appearance customization
 
 ---
 
-[Smart Date Picker UI](assets/demo_video.gif)
-
----
 ## Features
 
 - Easy integration with `TextFormField`
@@ -18,6 +15,10 @@ focus handling, and support for dynamic date ranges and appearance customization
 - Highly customizable UI with `PickerDecoration`
 - Supports min and max date boundaries (`firstDate`, `lastDate`)
 
+---
+
+## Preview
+[<img src="https://raw.githubusercontent.com/sumit-home2904/smart_date_field_picker/assets/demo_video.gif" width="250" alt=""/>](screenshot_1.png)
 ---
 
 ## Installation
