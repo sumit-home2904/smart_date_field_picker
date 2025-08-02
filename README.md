@@ -6,7 +6,7 @@ focus handling, and support for dynamic date ranges and appearance customization
 
 ---
 
-![Smart Date Picker UI](assets/demo_video.gif)
+[Smart Date Picker UI](assets/demo_video.gif)
 
 ---
 ## Features
