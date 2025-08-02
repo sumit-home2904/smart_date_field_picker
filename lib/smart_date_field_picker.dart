@@ -9,32 +9,51 @@ import 'package:smart_date_field_picker/src/overlay_builder.dart';
 import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
+/// A customizable text field widget that allows users to pick a date from a dropdown-style overlay.
 class SmartDateFieldPicker extends StatefulWidget {
-  /// Controller for showing or hiding the dropdown overlay.
+  /// Controls the display of the dropdown overlay.
   final OverlayPortalController controller;
+
+  /// Whether the field is enabled for user interaction.
   final bool enabled;
+
+  /// Makes the field read-only (prevents typing if true).
   final bool? fieldReadOnly;
+
+  /// Decoration for the input field.
   final InputDecoration? decoration;
+
+  /// Optional offset to position the dropdown.
   final Offset? dropdownOffset;
+
+  /// Callback triggered when a date is selected.
   final void Function(DateTime? value) onDateSelected;
+
+  /// The initially selected date.
   final DateTime? initialDate;
+
+  /// The earliest date the user can select.
   final DateTime? firstDate;
+
+  /// The latest date the user can select.
   final DateTime? lastDate;
-  // final double? height,width;
+
+  /// Optional validator function for input validation.
   final String? Function(String?)? validator;
+
+  /// Appearance and behavior customization options for the picker.
   final PickerDecoration? pickerDecoration;
 
+  /// Focus node for managing field focus.
   final FocusNode? focusNode;
-  /// Specifies when the validator function should be called.
-  ///
-  /// Defaults to null.
+
+  /// When the validator function should be called.
   final AutovalidateMode? autoValidateMode;
 
-
-  /// Whether the field is read-only and input is only allowed from the dropdown.
+  /// Whether the field is completely read-only (prevents both typing and dropdown).
   final bool readOnly;
 
-  SmartDateFieldPicker({
+  const SmartDateFieldPicker({
     super.key,
     this.lastDate,
     this.focusNode,
@@ -53,30 +72,36 @@ class SmartDateFieldPicker extends StatefulWidget {
   });
 
   @override
-  State<SmartDateFieldPicker> createState() => _SmartDateFieldPickerState();
+  State<SmartDateFieldPicker> createState() => SmartDateFieldPickerState();
 }
 
-class _SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
-  /// Key for the main text field widget.
+class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
+  /// Key used to get the position of the text field.
   final GlobalKey textFieldKey = GlobalKey();
 
-  /// Layer link used to position the dropdown overlay.
+  /// Link between the text field and the overlay for correct positioning.
   final layerLink = LayerLink();
 
-  /// Whether typing in the input field is disabled.
+  /// Flag to determine if typing should be disabled.
   bool isTypingDisabled = false;
 
+  /// Controller to manage the text inside the field.
   final TextEditingController textController = TextEditingController();
 
+  /// Key for the overlay content widget.
   final GlobalKey contentKey = GlobalKey();
 
+  /// Focus node used internally (optional, as widget may also provide it).
   late FocusNode focusNode;
 
+  /// Formatter to enforce a DD/MM/YYYY date format.
   late final MaskTextInputFormatter maskFormatter;
 
   @override
   void initState() {
     super.initState();
+
+    /// Initialize the date mask formatter.
     maskFormatter = MaskTextInputFormatter(
       mask: '##/##/####',
       filter: {"#": RegExp(r'[0-9]')},
@@ -84,101 +109,106 @@ class _SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    return  OverlayPortal(
-        controller: widget.controller,
-        overlayChildBuilder: (context) {
-          final RenderBox? textRenderBox = textFieldKey.currentContext?.findRenderObject() as RenderBox?;
+    return OverlayPortal(
+      controller: widget.controller,
+      overlayChildBuilder: (context) {
+        final RenderBox? textRenderBox =
+            textFieldKey.currentContext?.findRenderObject() as RenderBox?;
 
-          return GestureDetector(
-            onTap: () {
-              widget.controller.hide();
-            },
-            child: Container(
-              color: Colors.transparent,
-              child: Stack(
-                children: [
-                  OverlayBuilder(
-                    key: contentKey,
-                    layerLink: layerLink,
-                    renderBox: textRenderBox,
-                    lastDate: widget.lastDate,
-                    firstDate: widget.firstDate,
-                    controller: widget.controller,
-                    textController: textController,
-                    initialDate: widget.initialDate,
-                    dropdownOffset: widget.dropdownOffset,
-                    pickerDecoration: widget.pickerDecoration,
-                    onDateSelected: (value) {
-                      widget.onDateSelected(value);
-                      if (!(widget.readOnly)) {
-                        widget.controller.hide();
-                      }
-                    },
-                  )
-                ],
-              ),
+        return GestureDetector(
+          onTap: () {
+            // Tapping outside should close the dropdown.
+            widget.controller.hide();
+          },
+          child: Container(
+            color: Colors.transparent,
+            child: Stack(
+              children: [
+                OverlayBuilder(
+                  key: contentKey,
+                  layerLink: layerLink,
+                  renderBox: textRenderBox,
+                  lastDate: widget.lastDate,
+                  firstDate: widget.firstDate,
+                  controller: widget.controller,
+                  textController: textController,
+                  initialDate: widget.initialDate,
+                  dropdownOffset: widget.dropdownOffset,
+                  pickerDecoration: widget.pickerDecoration,
+                  onDateSelected: (value) {
+                    widget.onDateSelected(value);
+                    if (!widget.readOnly) {
+                      widget.controller.hide();
+                    }
+                  },
+                )
+              ],
             ),
-          );
-        },
-        child: CompositedTransformTarget(
-          link: layerLink,
-          child: Listener(
-              onPointerDown: (PointerDownEvent event) {
-                if (event.buttons == kSecondaryMouseButton) {
-                  // Disable typing on secondary mouse button press
-                  setState(() {
-                    isTypingDisabled = true;
-                  });
-                } else {
-                  setState(() {
-                    isTypingDisabled = false;
-                  });
-                }
-              },
-              child: TextFormField(
-                enabled: widget.enabled,
-                controller: textController,
-                validator: widget.validator,
-                focusNode: widget.focusNode,
-                onTap: () => textFiledOnTap(),
-                inputFormatters: [maskFormatter],
-                keyboardType: TextInputType.number,
-                onChanged: (value) => dropDownOpen(),
-                onFieldSubmitted: (value) => widget.controller.hide(),
-                style: widget.pickerDecoration?.textStyle,
-                autovalidateMode: widget.autoValidateMode,
-                showCursor: widget.pickerDecoration?.showCursor,
-                cursorHeight: widget.pickerDecoration?.cursorHeight,
-                cursorRadius: widget.pickerDecoration?.cursorRadius,
-                cursorWidth: widget.pickerDecoration?.cursorWidth ?? 2.0,
-                decoration: (widget.decoration ?? const InputDecoration()),
-                textAlign: widget.pickerDecoration?.textAlign ?? TextAlign.start,
-                cursorColor: widget.pickerDecoration?.cursorColor ?? Colors.black,
-                readOnly: isTypingDisabled ? true : widget.fieldReadOnly ?? widget.readOnly,
-                cursorErrorColor: widget.pickerDecoration?.cursorErrorColor ?? Colors.black,
-                enableInteractiveSelection: widget.pickerDecoration?.enableInteractiveSelection ?? (!(widget.fieldReadOnly ?? false)),
-              )),
+          ),
+        );
+      },
+      child: CompositedTransformTarget(
+        link: layerLink,
+        child: Listener(
+          onPointerDown: (PointerDownEvent event) {
+            // Disable typing on right-click (secondary mouse button).
+            if (event.buttons == kSecondaryMouseButton) {
+              setState(() {
+                isTypingDisabled = true;
+              });
+            } else {
+              setState(() {
+                isTypingDisabled = false;
+              });
+            }
+          },
+          child: TextFormField(
+            key: textFieldKey,
+            enabled: widget.enabled,
+            controller: textController,
+            validator: widget.validator,
+            focusNode: widget.focusNode,
+            onTap: () => textFiledOnTap(),
+            inputFormatters: [maskFormatter],
+            keyboardType: TextInputType.number,
+            onChanged: (value) => dropDownOpen(),
+            onFieldSubmitted: (value) => widget.controller.hide(),
+            style: widget.pickerDecoration?.textStyle,
+            autovalidateMode: widget.autoValidateMode,
+            showCursor: widget.pickerDecoration?.showCursor,
+            cursorHeight: widget.pickerDecoration?.cursorHeight,
+            cursorRadius: widget.pickerDecoration?.cursorRadius,
+            cursorWidth: widget.pickerDecoration?.cursorWidth ?? 2.0,
+            decoration: widget.decoration ?? const InputDecoration(),
+            textAlign: widget.pickerDecoration?.textAlign ?? TextAlign.start,
+            cursorColor: widget.pickerDecoration?.cursorColor ?? Colors.black,
+            readOnly: isTypingDisabled
+                ? true
+                : widget.fieldReadOnly ?? widget.readOnly,
+            cursorErrorColor:
+                widget.pickerDecoration?.cursorErrorColor ?? Colors.black,
+            enableInteractiveSelection:
+                widget.pickerDecoration?.enableInteractiveSelection ??
+                    (!(widget.fieldReadOnly ?? false)),
+          ),
         ),
+      ),
     );
   }
 
-  /// drop-down on tap function
-  textFiledOnTap() async {
-    if (!(widget.readOnly)) {
+  /// Handles tap on the input field to show the date picker overlay.
+  void textFiledOnTap() {
+    if (!widget.readOnly) {
       widget.controller.show();
     }
   }
 
-  ///open drop down when any event trigger.
-  dropDownOpen() {
-    if (!(widget.readOnly)) {
-      if (!widget.controller.isShowing) {
-        widget.controller.show();
-      }
+  /// Shows the dropdown if not already shown and field is editable.
+  void dropDownOpen() {
+    if (!widget.readOnly && !widget.controller.isShowing) {
+      widget.controller.show();
     }
   }
 }
