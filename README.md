@@ -128,6 +128,5 @@ The calendar uses `FocusNode`s to support keyboard navigation and focus cycling.
 | `textController`      | `TextEditingController`       | Controller for managing text manually                        |
 | `dropdownOffset`      | `Offset?`                     | Customize dropdown placement                                 |
 | `layerLink`           | `LayerLink`                   | Used for overlay positioning                                 |
-| `renderBox`           | `RenderBox?`                  | Optional: To help compute overlay position dynamically       |
 
 ---

@@ -49,7 +49,7 @@ class MyYearPickerState extends State<MyYearPicker> {
   late List<FocusNode> monthFocusNodes;
 
   /// Index of the currently focused year.
-  late int focusMonthIndex;
+  int focusMonthIndex = -1;
 
   /// Currently selected year.
   late int selectedYear;
@@ -60,13 +60,23 @@ class MyYearPickerState extends State<MyYearPicker> {
   /// List of all years between [firstDate] and [lastDate].
   List<int> yearList = [];
 
+  late List<GlobalKey> itemListKey = [];
   @override
   void initState() {
     super.initState();
 
+    scrollController.addListener(() {
+      if (monthFocusNodes[focusedIndex].hasFocus == false &&
+          focusedIndex >= 0 &&
+          focusedIndex < monthFocusNodes.length) {
+        monthFocusNodes[focusedIndex].requestFocus();
+      }
+    });
+
+
     yearList = List.generate(
       (widget.lastDate?.year ?? 2100) - (widget.firstDate?.year ?? 1900) + 1,
-      (i) => (widget.firstDate?.year ?? 1900) + i,
+          (i) => (widget.firstDate?.year ?? 1900) + i,
     );
 
     selectedYear = widget.initialDate.year;
@@ -77,12 +87,17 @@ class MyYearPickerState extends State<MyYearPicker> {
     int totalYears = endYear - startYear + 1;
 
     monthFocusNodes = List.generate(totalYears, (_) => FocusNode());
+    itemListKey = List.generate(totalYears, (_) => GlobalKey());
 
-    focusMonthIndex = widget.currentDisplayDate.year - startYear;
-
-    // Focus on the currently displayed year
+    // Wait for layout and then scroll to focused year
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      focusMonthIndex = widget.currentDisplayDate.year - startYear;
+      focusedIndex = focusMonthIndex;
+
       monthFocusNodes[focusMonthIndex].requestFocus();
+      scrollToFocusedItem();
+
     });
   }
 
@@ -90,11 +105,11 @@ class MyYearPickerState extends State<MyYearPicker> {
   @override
   void didUpdateWidget(covariant MyYearPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.firstDate != oldWidget.firstDate ||
-        widget.lastDate != oldWidget.lastDate) {
+
+    if (widget.firstDate != oldWidget.firstDate || widget.lastDate != oldWidget.lastDate) {
       yearList = List.generate(
         (widget.lastDate?.year ?? 2100) - (widget.firstDate?.year ?? 1900) + 1,
-        (i) => (widget.firstDate?.year ?? 1900) + i,
+            (i) => (widget.firstDate?.year ?? 1900) + i,
       );
 
       selectedYear = widget.initialDate.year;
@@ -107,12 +122,15 @@ class MyYearPickerState extends State<MyYearPicker> {
       monthFocusNodes = List.generate(totalYears, (_) => FocusNode());
 
       focusMonthIndex = widget.currentDisplayDate.year - startYear;
+      focusedIndex = focusMonthIndex;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         monthFocusNodes[focusMonthIndex].requestFocus();
+        scrollToFocusedItem(); // 👈 Ensure focused year is visible
       });
     }
   }
+
 
   @override
   void dispose() {
@@ -129,24 +147,77 @@ class MyYearPickerState extends State<MyYearPicker> {
     if (newIndex >= 0 && newIndex < totalYears) {
       setState(() {
         focusMonthIndex = newIndex;
+        focusedIndex = newIndex;
         monthFocusNodes[focusMonthIndex].requestFocus();
       });
+
     } else {
       // Loop focus if it overflows
       if (newIndex == totalYears) {
         setState(() {
+          focusedIndex = 0;
           focusMonthIndex = 0;
           monthFocusNodes[focusMonthIndex].requestFocus();
         });
       }
       if (newIndex == -1) {
         setState(() {
+          focusedIndex = -1;
           focusMonthIndex = totalYears - 1;
           monthFocusNodes[focusMonthIndex].requestFocus();
         });
       }
     }
+
+    scrollToFocusedItem();
   }
+
+  int focusedIndex = -1;
+  final ScrollController scrollController = ScrollController();
+
+  void scrollToFocusedItem() {
+    final RenderBox? itemRenderBox = itemListKey[focusedIndex].currentContext?.findRenderObject() as RenderBox?;
+    print(itemRenderBox);
+    if (itemRenderBox == null) return;
+
+    const int crossAxisCount = 3; // Keep in sync with your GridView column count
+    final double itemHeight = itemRenderBox.size.height;
+    final double viewHeight = widget.height;
+
+    // Total visible rows in the grid
+    final int maxVisibleRows = (viewHeight / itemHeight).floor();
+
+    // Current focused item's row index
+    final int focusedRow = focusedIndex ~/ crossAxisCount;
+
+    // Calculate first and last visible rows
+    final double currentScrollOffset = scrollController.offset;
+    final double firstVisibleRow = currentScrollOffset / itemHeight;
+    final double lastVisibleRow = firstVisibleRow + maxVisibleRows - 1;
+
+    // print("focusedRow  $focusedRow");
+    // print("lastVisibleRow  $lastVisibleRow");
+    // Scroll if focused row is outside visible range
+    if (focusedRow > lastVisibleRow) {
+      final double targetOffset = (focusedRow - maxVisibleRows + 1) * itemHeight;
+      // print("targetOffset 1 $targetOffset");
+      scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+      );
+    } else if (focusedRow < firstVisibleRow) {
+      final double targetOffset = focusedRow * itemHeight;
+      // print("targetOffset 2 $targetOffset");
+
+      scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -258,6 +329,7 @@ class MyYearPickerState extends State<MyYearPicker> {
             /// Grid of year options
             Expanded(
               child: GridView.builder(
+                controller: scrollController,
                 physics: const ClampingScrollPhysics(),
                 itemCount: yearList.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -271,18 +343,20 @@ class MyYearPickerState extends State<MyYearPicker> {
                   final isFocused = index == focusMonthIndex;
 
                   return Focus(
+                    key:  itemListKey[index],
                     focusNode: monthFocusNodes[index],
+                    autofocus: focusedIndex == index,
                     child: InkWell(
                       hoverColor:
                           widget
                               .pickerDecoration
-                              ?.monthDecoration
+                              ?.yearDecoration
                               ?.hoverColor ??
                           Colors.transparent,
                       focusColor:
                           widget
                               .pickerDecoration
-                              ?.monthDecoration
+                              ?.yearDecoration
                               ?.focusColor ??
                           Colors.transparent,
                       onTap: () {
@@ -295,7 +369,7 @@ class MyYearPickerState extends State<MyYearPicker> {
                       },
                       child: Container(
                         margin: const EdgeInsets.all(4),
-                        decoration: monthDecoration(isSelected, isFocused),
+                        decoration: yearDecoration(isSelected, isFocused),
                         child: Center(
                           child: Text(
                             year.toString(),
@@ -314,42 +388,43 @@ class MyYearPickerState extends State<MyYearPicker> {
     );
   }
 
+
   /// Returns the text style for each year tile.
   TextStyle monthStyle(bool isSelected, bool isFocused) {
     if (isFocused && !isSelected) {
-      return widget.pickerDecoration?.monthDecoration?.disableTextStyle ??
+      return widget.pickerDecoration?.yearDecoration?.disableTextStyle ??
           TextStyle(
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.normal,
           );
     } else if (isSelected) {
-      return widget.pickerDecoration?.monthDecoration?.selectedTextStyle ??
+      return widget.pickerDecoration?.yearDecoration?.selectedTextStyle ??
           TextStyle(
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           );
     } else {
-      return widget.pickerDecoration?.monthDecoration?.unSelectedTextStyle ??
+      return widget.pickerDecoration?.yearDecoration?.unSelectedTextStyle ??
           const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
     }
   }
 
   /// Returns the decoration for each year tile depending on focus/selection.
-  BoxDecoration monthDecoration(bool isSelected, bool isFocused) {
+  BoxDecoration yearDecoration(bool isSelected, bool isFocused) {
     if (isFocused) {
-      return widget.pickerDecoration?.monthDecoration?.focusDecoration ??
+      return widget.pickerDecoration?.yearDecoration?.focusDecoration ??
           BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Theme.of(context).primaryColor, width: 2),
           );
     } else if (isSelected) {
-      return widget.pickerDecoration?.monthDecoration?.selectedDecoration ??
+      return widget.pickerDecoration?.yearDecoration?.selectedDecoration ??
           BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Theme.of(context).primaryColor),
           );
     } else {
-      return widget.pickerDecoration?.monthDecoration?.unSelectedDecoration ??
+      return widget.pickerDecoration?.yearDecoration?.unSelectedDecoration ??
           BoxDecoration(
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(8),

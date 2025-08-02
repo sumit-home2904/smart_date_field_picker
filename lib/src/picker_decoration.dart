@@ -53,6 +53,7 @@ class PickerDecoration {
   /// Styling configuration for the header section.
   final HeaderDecoration? headerDecoration;
 
+  final YearDecoration? yearDecoration;
   const PickerDecoration({
     this.width,
     this.height,
@@ -71,6 +72,7 @@ class PickerDecoration {
     this.monthDecoration,
     this.cursorErrorColor,
     this.headerDecoration,
+    this.yearDecoration,
     this.enableInteractiveSelection,
   });
 
@@ -91,6 +93,7 @@ class PickerDecoration {
     TextStyle? weekTextStyle,
     Decoration? menuDecoration,
     DayDecoration? dayDecoration,
+    YearDecoration? yearDecoration,
     MonthDecoration? monthDecoration,
     bool? enableInteractiveSelection,
     HeaderDecoration? headerDecoration,
@@ -109,6 +112,7 @@ class PickerDecoration {
       cursorHeight: cursorHeight ?? this.cursorHeight,
       dayDecoration: dayDecoration ?? this.dayDecoration,
       weekTextStyle: weekTextStyle ?? this.weekTextStyle,
+      yearDecoration: yearDecoration ?? this.yearDecoration,
       menuDecoration: menuDecoration ?? this.menuDecoration,
       monthDecoration: monthDecoration ?? this.monthDecoration,
       cursorErrorColor: cursorErrorColor ?? this.cursorErrorColor,
@@ -245,7 +249,7 @@ class IconDecoration {
   }
 }
 
-/// Defines styling for year or month tiles in the picker.
+/// Defines styling for month tiles in the picker.
 class MonthDecoration {
   /// Hover color for the cell.
   final Color? hoverColor;
@@ -306,6 +310,70 @@ class MonthDecoration {
     );
   }
 }
+
+
+/// Defines styling for year tiles in the picker.
+class YearDecoration {
+  /// Hover color for the cell.
+  final Color? hoverColor;
+
+  /// Focus color for the cell.
+  final Color? focusColor;
+
+  /// Text style when the cell is selected.
+  final TextStyle? selectedTextStyle;
+
+  /// Text style when the cell is not selected.
+  final TextStyle? unSelectedTextStyle;
+
+  /// Text style when the cell is disabled.
+  final TextStyle? disableTextStyle;
+
+  /// Box decoration when the cell is selected.
+  final BoxDecoration? selectedDecoration;
+
+  /// Box decoration when the cell is focused.
+  final BoxDecoration? focusDecoration;
+
+  /// Box decoration when the cell is not selected.
+  final BoxDecoration? unSelectedDecoration;
+
+  const YearDecoration({
+    this.hoverColor,
+    this.focusColor,
+    this.disableTextStyle,
+    this.focusDecoration,
+    this.selectedTextStyle,
+    this.selectedDecoration,
+    this.unSelectedTextStyle,
+    this.unSelectedDecoration,
+  });
+
+  YearDecoration copyWith({
+    double? height,
+    double? width,
+    Color? hoverColor,
+    Color? focusColor,
+    TextStyle? disableTextStyle,
+    TextStyle? selectedTextStyle,
+    BoxDecoration? focusDecoration,
+    TextStyle? unSelectedTextStyle,
+    BoxDecoration? selectedDecoration,
+    BoxDecoration? unSelectedDecoration,
+  }) {
+    return YearDecoration(
+      hoverColor: hoverColor ?? this.hoverColor,
+      focusColor: focusColor ?? this.focusColor,
+      focusDecoration: focusDecoration ?? this.focusDecoration,
+      disableTextStyle: disableTextStyle ?? this.disableTextStyle,
+      selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
+      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
+      unSelectedTextStyle: unSelectedTextStyle ?? this.unSelectedTextStyle,
+      unSelectedDecoration: unSelectedDecoration ?? this.unSelectedDecoration,
+    );
+  }
+}
+
 
 /// Defines styling for individual day tiles in the picker calendar.
 class DayDecoration {
