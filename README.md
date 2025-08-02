@@ -18,7 +18,7 @@ focus handling, and support for dynamic date ranges and appearance customization
 ---
 
 ## Preview
-[<img src="https://raw.githubusercontent.com/sumit-home2904/smart_date_field_picker/assets/demo_video.gif" width="250" alt=""/>](screenshot_1.png)
+[<img src="https://raw.githubusercontent.com/sumit-home2904/smart_date_field_picker/master/assets/demo_video.gif" width="250" alt=""/>](assets/demo_video.gif)
 ---
 
 ## Installation
