@@ -242,11 +242,14 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   Widget _buildHeader() {
     return Container(
       alignment: widget.pickerDecoration?.headerDecoration?.alignment,
-      margin: widget.pickerDecoration?.headerDecoration?.headerMargin ??
+      margin:
+          widget.pickerDecoration?.headerDecoration?.headerMargin ??
           EdgeInsets.zero,
-      padding: widget.pickerDecoration?.headerDecoration?.headerPadding ??
+      padding:
+          widget.pickerDecoration?.headerDecoration?.headerPadding ??
           EdgeInsets.all(10),
-      decoration: widget.pickerDecoration?.headerDecoration?.headerDecoration ??
+      decoration:
+          widget.pickerDecoration?.headerDecoration?.headerDecoration ??
           BoxDecoration(
             color: Theme.of(context).primaryColor,
             borderRadius: const BorderRadius.only(
@@ -260,25 +263,45 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           /// Left arrow button for navigating to the previous month.
           IconButton(
             focusNode: arrowLeftFocusNode,
-            focusColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.focusColor ??
+            focusColor:
+                widget
+                    .pickerDecoration
+                    ?.headerDecoration
+                    ?.iconDecoration
+                    ?.focusColor ??
                 Colors.white,
-            hoverColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.hoverColor ??
+            hoverColor:
+                widget
+                    .pickerDecoration
+                    ?.headerDecoration
+                    ?.iconDecoration
+                    ?.hoverColor ??
                 Colors.white12,
             icon: Icon(
-              widget.pickerDecoration?.headerDecoration?.iconDecoration
+              widget
+                      .pickerDecoration
+                      ?.headerDecoration
+                      ?.iconDecoration
                       ?.leftIcon ??
                   Icons.chevron_left,
-              size: widget.pickerDecoration?.headerDecoration?.iconDecoration
+              size: widget
+                  .pickerDecoration
+                  ?.headerDecoration
+                  ?.iconDecoration
                   ?.leftIconSize,
               color: arrowLeftFocusNode.hasFocus
-                  ? widget.pickerDecoration?.headerDecoration?.iconDecoration
-                          ?.leftFocusIconColor ??
-                      Colors.black
-                  : widget.pickerDecoration?.headerDecoration?.iconDecoration
-                          ?.leftIconColor ??
-                      Colors.white,
+                  ? widget
+                            .pickerDecoration
+                            ?.headerDecoration
+                            ?.iconDecoration
+                            ?.leftFocusIconColor ??
+                        Colors.black
+                  : widget
+                            .pickerDecoration
+                            ?.headerDecoration
+                            ?.iconDecoration
+                            ?.leftIconColor ??
+                        Colors.white,
             ),
             onPressed: _canNavigateToPreviousMonth() ? _previousMonth : null,
           ),
@@ -290,11 +313,19 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             color: Colors.transparent,
             child: InkWell(
               focusNode: monthYearFocusNode,
-              focusColor: widget.pickerDecoration?.headerDecoration
-                      ?.iconDecoration?.focusColor ??
+              focusColor:
+                  widget
+                      .pickerDecoration
+                      ?.headerDecoration
+                      ?.iconDecoration
+                      ?.focusColor ??
                   Colors.white,
-              hoverColor: widget.pickerDecoration?.headerDecoration
-                      ?.iconDecoration?.hoverColor ??
+              hoverColor:
+                  widget
+                      .pickerDecoration
+                      ?.headerDecoration
+                      ?.iconDecoration
+                      ?.hoverColor ??
                   Colors.white12,
               borderRadius: BorderRadius.circular(05),
               onTap: () {
@@ -319,28 +350,48 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           /// Right arrow button for navigating to the next month.
           IconButton(
             focusNode: arrowRightFocusNode,
-            focusColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.focusColor ??
+            focusColor:
+                widget
+                    .pickerDecoration
+                    ?.headerDecoration
+                    ?.iconDecoration
+                    ?.focusColor ??
                 Colors.white,
-            hoverColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.hoverColor ??
+            hoverColor:
+                widget
+                    .pickerDecoration
+                    ?.headerDecoration
+                    ?.iconDecoration
+                    ?.hoverColor ??
                 Colors.white12,
             icon: Icon(
-              widget.pickerDecoration?.headerDecoration?.iconDecoration
+              widget
+                      .pickerDecoration
+                      ?.headerDecoration
+                      ?.iconDecoration
                       ?.rightIcon ??
                   Icons.chevron_right,
-              size: widget.pickerDecoration?.headerDecoration?.iconDecoration
+              size: widget
+                  .pickerDecoration
+                  ?.headerDecoration
+                  ?.iconDecoration
                   ?.rightIconSize,
               color: arrowRightFocusNode.hasFocus
-                  ? widget.pickerDecoration?.headerDecoration?.iconDecoration
-                          ?.rightFocusIconColor ??
-                      Colors.black
-                  : widget.pickerDecoration?.headerDecoration?.iconDecoration
-                          ?.rightIconColor ??
-                      Colors.white,
+                  ? widget
+                            .pickerDecoration
+                            ?.headerDecoration
+                            ?.iconDecoration
+                            ?.rightFocusIconColor ??
+                        Colors.black
+                  : widget
+                            .pickerDecoration
+                            ?.headerDecoration
+                            ?.iconDecoration
+                            ?.rightIconColor ??
+                        Colors.white,
             ),
             onPressed: _canNavigateToNextMonth() ? _nextMonth : null,
-          )
+          ),
         ],
       ),
     );
@@ -369,10 +420,16 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   bool _canNavigateToPreviousMonth() {
     if (widget.firstDate == null) return true;
 
-    DateTime firstOfMonth =
-        DateTime(_currentDisplayDate.year, _currentDisplayDate.month, 1);
-    DateTime firstOfPreviousMonth =
-        DateTime(firstOfMonth.year, firstOfMonth.month - 1, 1);
+    DateTime firstOfMonth = DateTime(
+      _currentDisplayDate.year,
+      _currentDisplayDate.month,
+      1,
+    );
+    DateTime firstOfPreviousMonth = DateTime(
+      firstOfMonth.year,
+      firstOfMonth.month - 1,
+      1,
+    );
 
     return !firstOfPreviousMonth.isBefore(
       DateTime(widget.firstDate!.year, widget.firstDate!.month, 1),
@@ -384,9 +441,15 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     if (_canNavigateToPreviousMonth()) {
       setState(() {
         focusSelectedDate = DateTime(
-            _currentDisplayDate.year, _currentDisplayDate.month - 1, 1);
+          _currentDisplayDate.year,
+          _currentDisplayDate.month - 1,
+          1,
+        );
         _currentDisplayDate = DateTime(
-            _currentDisplayDate.year, _currentDisplayDate.month - 1, 1);
+          _currentDisplayDate.year,
+          _currentDisplayDate.month - 1,
+          1,
+        );
       });
     }
   }
@@ -395,10 +458,16 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   bool _canNavigateToNextMonth() {
     if (widget.lastDate == null) return true;
 
-    DateTime firstOfMonth =
-        DateTime(_currentDisplayDate.year, _currentDisplayDate.month, 1);
-    DateTime firstOfNextMonth =
-        DateTime(firstOfMonth.year, firstOfMonth.month + 1, 1);
+    DateTime firstOfMonth = DateTime(
+      _currentDisplayDate.year,
+      _currentDisplayDate.month,
+      1,
+    );
+    DateTime firstOfNextMonth = DateTime(
+      firstOfMonth.year,
+      firstOfMonth.month + 1,
+      1,
+    );
 
     return !firstOfNextMonth.isAfter(
       DateTime(widget.lastDate!.year, widget.lastDate!.month, 1),
@@ -410,9 +479,15 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     if (_canNavigateToNextMonth()) {
       setState(() {
         focusSelectedDate = DateTime(
-            _currentDisplayDate.year, _currentDisplayDate.month + 1, 1);
+          _currentDisplayDate.year,
+          _currentDisplayDate.month + 1,
+          1,
+        );
         _currentDisplayDate = DateTime(
-            _currentDisplayDate.year, _currentDisplayDate.month + 1, 1);
+          _currentDisplayDate.year,
+          _currentDisplayDate.month + 1,
+          1,
+        );
       });
     }
   }
@@ -430,9 +505,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     final endDate = lastDayOfMonth.add(Duration(days: endOffset));
 
     List<DateTime> days = [];
-    for (DateTime d = startDate;
-        !d.isAfter(endDate);
-        d = d.add(Duration(days: 1))) {
+    for (
+      DateTime d = startDate;
+      !d.isAfter(endDate);
+      d = d.add(Duration(days: 1))
+    ) {
       days.add(d);
     }
     return days;
@@ -442,7 +519,13 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   /// ensuring alignment with the current month display.
   List<DateTime> _generateCalendarDays() {
     final firstDayOfMonth = DateTime(
-        _currentDisplayDate.year, _currentDisplayDate.month, 1, 0, 0, 0);
+      _currentDisplayDate.year,
+      _currentDisplayDate.month,
+      1,
+      0,
+      0,
+      0,
+    );
     int daysBefore = firstDayOfMonth.weekday % 7;
 
     return List.generate(42, (index) {
@@ -455,7 +538,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Moves focus to the adjacent month and aligns focus to the correct weekday column.
   void moveFocusToAdjacentMonth(
-      int direction, int currentIndex, DateTime targetMonth) {
+    int direction,
+    int currentIndex,
+    DateTime targetMonth,
+  ) {
     setState(() {
       _currentDisplayDate = targetMonth;
     });
@@ -486,7 +572,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Moves focus horizontally to an adjacent month (left or right).
   void moveFocusLeftRightAdjacentMonth(
-      int direction, int currentIndex, DateTime targetMonth) {
+    int direction,
+    int currentIndex,
+    DateTime targetMonth,
+  ) {
     setState(() {
       _currentDisplayDate = targetMonth;
     });
@@ -570,9 +659,17 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             }
           } else {
             final prevMonth = DateTime(
-                _currentDisplayDate.year, _currentDisplayDate.month - 1, 1);
-            if (!prevMonth.isBefore(DateTime(widget.firstDate?.year ?? 1900,
-                widget.firstDate?.month ?? 1, 1))) {
+              _currentDisplayDate.year,
+              _currentDisplayDate.month - 1,
+              1,
+            );
+            if (!prevMonth.isBefore(
+              DateTime(
+                widget.firstDate?.year ?? 1900,
+                widget.firstDate?.month ?? 1,
+                1,
+              ),
+            )) {
               moveFocusLeftRightAdjacentMonth(-1, currentIndex, prevMonth);
             }
           }
@@ -594,9 +691,13 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             }
           } else {
             final nextMonth = DateTime(
-                _currentDisplayDate.year, _currentDisplayDate.month + 1, 1);
-            if (!nextMonth
-                .isAfter(DateTime(widget.lastDate?.year ?? 2100, 12, 31))) {
+              _currentDisplayDate.year,
+              _currentDisplayDate.month + 1,
+              1,
+            );
+            if (!nextMonth.isAfter(
+              DateTime(widget.lastDate?.year ?? 2100, 12, 31),
+            )) {
               moveFocusLeftRightAdjacentMonth(1, currentIndex, nextMonth);
             }
           }
@@ -614,16 +715,26 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                   focusSelectedDate = targetDate;
                   if (targetDate.month != _currentDisplayDate.month ||
                       targetDate.year != _currentDisplayDate.year) {
-                    _currentDisplayDate =
-                        DateTime(targetDate.year, targetDate.month);
+                    _currentDisplayDate = DateTime(
+                      targetDate.year,
+                      targetDate.month,
+                    );
                   }
                 });
               }
             } else {
               final prevMonth = DateTime(
-                  _currentDisplayDate.year, _currentDisplayDate.month - 1, 1);
-              if (!prevMonth.isBefore(DateTime(widget.firstDate?.year ?? 1900,
-                  widget.firstDate?.month ?? 1, 1))) {
+                _currentDisplayDate.year,
+                _currentDisplayDate.month - 1,
+                1,
+              );
+              if (!prevMonth.isBefore(
+                DateTime(
+                  widget.firstDate?.year ?? 1900,
+                  widget.firstDate?.month ?? 1,
+                  1,
+                ),
+              )) {
                 moveFocusToAdjacentMonth(-1, currentIndex, prevMonth);
               }
             }
@@ -640,16 +751,24 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               setState(() {
                 focusSelectedDate = targetDate;
                 if (targetDate.month != _currentDisplayDate.month) {
-                  _currentDisplayDate =
-                      DateTime(targetDate.year, targetDate.month);
+                  _currentDisplayDate = DateTime(
+                    targetDate.year,
+                    targetDate.month,
+                  );
                 }
               });
             }
           } else {
             final nextMonth = DateTime(
-                _currentDisplayDate.year, _currentDisplayDate.month + 1, 1);
-            final lastAllowedDate =
-                DateTime(widget.lastDate?.year ?? 2100, 12, 31);
+              _currentDisplayDate.year,
+              _currentDisplayDate.month + 1,
+              1,
+            );
+            final lastAllowedDate = DateTime(
+              widget.lastDate?.year ?? 2100,
+              12,
+              31,
+            );
             if (!nextMonth.isAfter(lastAllowedDate)) {
               moveFocusToAdjacentMonth(1, currentIndex, nextMonth);
             }
@@ -666,10 +785,12 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               children: List.generate(calendarDays.length, (index) {
                 final date = calendarDays[index];
                 final isCurrentMonth = date.month == _currentDisplayDate.month;
-                final isSelected = date.year == selectedDate.year &&
+                final isSelected =
+                    date.year == selectedDate.year &&
                     date.month == selectedDate.month &&
                     date.day == selectedDate.day;
-                final isFocusDate = date.year == focusSelectedDate.year &&
+                final isFocusDate =
+                    date.year == focusSelectedDate.year &&
                     date.month == focusSelectedDate.month &&
                     date.day == focusSelectedDate.day;
 
@@ -692,12 +813,18 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                       child: Container(
                         margin: const EdgeInsets.all(4),
                         decoration: dayDecoration(
-                            isCurrentMonth, isFocusDate, isSelected),
+                          isCurrentMonth,
+                          isFocusDate,
+                          isSelected,
+                        ),
                         alignment: Alignment.center,
                         child: Text(
                           '${date.day}',
                           style: dayTextStyle(
-                              isCurrentMonth, isFocusDate, isSelected),
+                            isCurrentMonth,
+                            isFocusDate,
+                            isSelected,
+                          ),
                         ),
                       ),
                     ),
@@ -713,7 +840,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Returns the decoration for each day cell based on its state (selected, focused, etc.).
   BoxDecoration dayDecoration(
-      bool isCurrentMonth, bool isFocusDate, bool isSelected) {
+    bool isCurrentMonth,
+    bool isFocusDate,
+    bool isSelected,
+  ) {
     if (isCurrentMonth && isSelected) {
       return widget.pickerDecoration?.dayDecoration?.selectedDecoration ??
           BoxDecoration(
@@ -741,7 +871,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Returns the text style for day numbers based on their state.
   TextStyle dayTextStyle(
-      bool isCurrentMonth, bool isFocusDate, bool isSelected) {
+    bool isCurrentMonth,
+    bool isFocusDate,
+    bool isSelected,
+  ) {
     if (isCurrentMonth) {
       if (isSelected) {
         return widget.pickerDecoration?.dayDecoration?.selectedTextStyle ??
@@ -770,7 +903,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             child: Center(
               child: Text(
                 weekday,
-                style: widget.pickerDecoration?.weekTextStyle ??
+                style:
+                    widget.pickerDecoration?.weekTextStyle ??
                     TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ),
@@ -783,10 +917,16 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   /// Generates the calendar grid dates based on [focusSelectedDate].
   /// Includes leading and trailing days to complete full weeks.
   List<DateTime> _generateCalendarDates() {
-    DateTime firstDayOfMonth =
-        DateTime(focusSelectedDate.year, focusSelectedDate.month, 1);
-    DateTime lastDayOfMonth =
-        DateTime(focusSelectedDate.year, focusSelectedDate.month + 1, 0);
+    DateTime firstDayOfMonth = DateTime(
+      focusSelectedDate.year,
+      focusSelectedDate.month,
+      1,
+    );
+    DateTime lastDayOfMonth = DateTime(
+      focusSelectedDate.year,
+      focusSelectedDate.month + 1,
+      0,
+    );
     int daysInMonth = lastDayOfMonth.day;
     int firstWeekday = firstDayOfMonth.weekday % 7;
 
@@ -799,8 +939,9 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
     // Add current month days
     for (int day = 1; day <= daysInMonth; day++) {
-      calendarDates
-          .add(DateTime(focusSelectedDate.year, focusSelectedDate.month, day));
+      calendarDates.add(
+        DateTime(focusSelectedDate.year, focusSelectedDate.month, day),
+      );
     }
 
     // Add next month's leading days to complete last week
@@ -833,83 +974,87 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     return CompositedTransformFollower(
       link: widget.layerLink,
       offset: setOffset(),
-      followerAnchor:
-          displayOverlayBottom ? Alignment.topLeft : Alignment.bottomLeft,
-      child: LayoutBuilder(builder: (context, c) {
-        return Container(
-          key: key1,
-          height: widget.pickerDecoration?.height ?? 330,
-          decoration: widget.pickerDecoration?.menuDecoration ??
-              BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(25),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  ),
+      followerAnchor: displayOverlayBottom
+          ? Alignment.topLeft
+          : Alignment.bottomLeft,
+      child: LayoutBuilder(
+        builder: (context, c) {
+          return Container(
+            key: key1,
+            height: widget.pickerDecoration?.height ?? 330,
+            decoration:
+                widget.pickerDecoration?.menuDecoration ??
+                BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(25),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+            child: SizedBox(
+              key: key2,
+              height: widget.pickerDecoration?.height ?? 330,
+              width: widget.pickerDecoration?.width ?? 270,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (canShowDate) _buildHeader(),
+                  if (canShowDate) Expanded(child: _buildCalendar()),
+                  if (canShowMonth && !canShowYear)
+                    Expanded(
+                      child: MyMonthPicker(
+                        lastDate: widget.lastDate,
+                        firstDate: widget.firstDate,
+                        initialDate: _currentDisplayDate,
+                        pickerDecoration: widget.pickerDecoration,
+                        width: widget.pickerDecoration?.width ?? 270,
+                        height: widget.pickerDecoration?.height ?? 320,
+                        currentDisplayDate: _currentDisplayDate,
+                        changeToYearPicker: () {
+                          setState(() {
+                            canShowYear = true;
+                          });
+                        },
+                        onDateChanged: (date) {
+                          setState(() {
+                            _currentDisplayDate = date;
+                            focusSelectedDate = date;
+                            dateFocusNode.requestFocus();
+                            canShowMonth = false;
+                            canShowDate = true;
+                          });
+                        },
+                      ),
+                    ),
+                  if (canShowYear)
+                    Expanded(
+                      child: MyYearPicker(
+                        lastDate: widget.lastDate,
+                        firstDate: widget.firstDate,
+                        initialDate: _currentDisplayDate,
+                        currentDisplayDate: _currentDisplayDate,
+                        pickerDecoration: widget.pickerDecoration,
+                        width: widget.pickerDecoration?.width ?? 270,
+                        height: widget.pickerDecoration?.height ?? 320,
+                        onDateChanged: (date) {
+                          setState(() {
+                            _currentDisplayDate = date;
+                            focusSelectedDate = date;
+                            canShowYear = false;
+                          });
+                        },
+                      ),
+                    ),
                 ],
               ),
-          child: SizedBox(
-            key: key2,
-            height: widget.pickerDecoration?.height ?? 330,
-            width: widget.pickerDecoration?.width ?? 270,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (canShowDate) _buildHeader(),
-                if (canShowDate) Expanded(child: _buildCalendar()),
-                if (canShowMonth && !canShowYear)
-                  Expanded(
-                    child: MyMonthPicker(
-                      lastDate: widget.lastDate,
-                      firstDate: widget.firstDate,
-                      initialDate: _currentDisplayDate,
-                      pickerDecoration: widget.pickerDecoration,
-                      width: widget.pickerDecoration?.width ?? 270,
-                      height: widget.pickerDecoration?.height ?? 320,
-                      currentDisplayDate: _currentDisplayDate,
-                      changeToYearPicker: () {
-                        setState(() {
-                          canShowYear = true;
-                        });
-                      },
-                      onDateChanged: (date) {
-                        setState(() {
-                          _currentDisplayDate = date;
-                          focusSelectedDate = date;
-                          dateFocusNode.requestFocus();
-                          canShowMonth = false;
-                          canShowDate = true;
-                        });
-                      },
-                    ),
-                  ),
-                if (canShowYear)
-                  Expanded(
-                    child: MyYearPicker(
-                      lastDate: widget.lastDate,
-                      firstDate: widget.firstDate,
-                      initialDate: _currentDisplayDate,
-                      currentDisplayDate: _currentDisplayDate,
-                      pickerDecoration: widget.pickerDecoration,
-                      width: widget.pickerDecoration?.width ?? 270,
-                      height: widget.pickerDecoration?.height ?? 320,
-                      onDateChanged: (date) {
-                        setState(() {
-                          _currentDisplayDate = date;
-                          focusSelectedDate = date;
-                          canShowYear = false;
-                        });
-                      },
-                    ),
-                  )
-              ],
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 

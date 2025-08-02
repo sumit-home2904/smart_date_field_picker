@@ -129,8 +129,9 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
         LogicalKeySet(LogicalKeyboardKey.tab): () {
           if (monthYearFocusNode.hasFocus) {
             focusMonthIndex = widget.currentDisplayDate.month - 1;
-            FocusScope.of(context)
-                .requestFocus(monthFocusNodes[focusMonthIndex]);
+            FocusScope.of(
+              context,
+            ).requestFocus(monthFocusNodes[focusMonthIndex]);
           } else {
             focusMonthIndex = -1;
             monthYearFocusNode.requestFocus();
@@ -147,8 +148,9 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
         LogicalKeySet(LogicalKeyboardKey.arrowDown): () {
           if (monthYearFocusNode.hasFocus) {
             focusMonthIndex = widget.currentDisplayDate.month - 1;
-            FocusScope.of(context)
-                .requestFocus(monthFocusNodes[focusMonthIndex]);
+            FocusScope.of(
+              context,
+            ).requestFocus(monthFocusNodes[focusMonthIndex]);
           } else {
             moveFocus(focusMonthIndex + 3);
           }
@@ -177,15 +179,18 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                 width: widget.width,
                 alignment:
                     widget.pickerDecoration?.headerDecoration?.alignment ??
-                        Alignment.center,
+                    Alignment.center,
                 margin:
                     widget.pickerDecoration?.headerDecoration?.headerMargin ??
-                        EdgeInsets.zero,
+                    EdgeInsets.zero,
                 padding:
                     widget.pickerDecoration?.headerDecoration?.headerPadding ??
-                        EdgeInsets.all(10),
-                decoration: widget
-                        .pickerDecoration?.headerDecoration?.headerDecoration ??
+                    EdgeInsets.all(10),
+                decoration:
+                    widget
+                        .pickerDecoration
+                        ?.headerDecoration
+                        ?.headerDecoration ??
                     BoxDecoration(
                       color: Theme.of(context).primaryColor,
                       borderRadius: const BorderRadius.only(
@@ -197,11 +202,19 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                   color: Colors.transparent,
                   child: InkWell(
                     focusNode: monthYearFocusNode,
-                    focusColor: widget.pickerDecoration?.headerDecoration
-                            ?.iconDecoration?.focusColor ??
+                    focusColor:
+                        widget
+                            .pickerDecoration
+                            ?.headerDecoration
+                            ?.iconDecoration
+                            ?.focusColor ??
                         Colors.white,
-                    hoverColor: widget.pickerDecoration?.headerDecoration
-                            ?.iconDecoration?.hoverColor ??
+                    hoverColor:
+                        widget
+                            .pickerDecoration
+                            ?.headerDecoration
+                            ?.iconDecoration
+                            ?.hoverColor ??
                         Colors.white12,
                     borderRadius: BorderRadius.circular(5),
                     onTap: () => widget.changeToYearPicker(),
@@ -237,10 +250,16 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                     return Focus(
                       focusNode: monthFocusNodes[index],
                       child: InkWell(
-                        hoverColor: widget.pickerDecoration?.monthDecoration
+                        hoverColor:
+                            widget
+                                .pickerDecoration
+                                ?.monthDecoration
                                 ?.hoverColor ??
                             Colors.transparent,
-                        focusColor: widget.pickerDecoration?.monthDecoration
+                        focusColor:
+                            widget
+                                .pickerDecoration
+                                ?.monthDecoration
                                 ?.focusColor ??
                             Colors.transparent,
                         onTap: () {
@@ -283,10 +302,7 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
           );
     } else {
       return widget.pickerDecoration?.monthDecoration?.unSelectedTextStyle ??
-          const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.normal,
-          );
+          const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
     }
   }
 

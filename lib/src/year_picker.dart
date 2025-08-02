@@ -158,8 +158,9 @@ class MyYearPickerState extends State<MyYearPicker> {
           final startYear = widget.firstDate?.year ?? 1900;
           final index = currentYear - startYear;
 
-          final fallbackIndex =
-              (index >= 0 && index < monthFocusNodes.length) ? index : 0;
+          final fallbackIndex = (index >= 0 && index < monthFocusNodes.length)
+              ? index
+              : 0;
 
           if (!monthFocusNodes.any((node) => node.hasFocus)) {
             focusMonthIndex = fallbackIndex;
@@ -196,15 +197,20 @@ class MyYearPickerState extends State<MyYearPicker> {
             final selectedMonth = widget.currentDisplayDate.month;
             final selectedDay = widget.currentDisplayDate.day;
 
-            final maxDay =
-                DateUtils.getDaysInMonth(selectedYear, selectedMonth);
+            final maxDay = DateUtils.getDaysInMonth(
+              selectedYear,
+              selectedMonth,
+            );
             final clampedDay = selectedDay > maxDay ? maxDay : selectedDay;
 
-            final selectedDate =
-                DateTime(selectedYear, selectedMonth, clampedDay);
+            final selectedDate = DateTime(
+              selectedYear,
+              selectedMonth,
+              clampedDay,
+            );
             widget.onDateChanged(selectedDate);
           }
-        }
+        },
       },
       child: SizedBox(
         height: widget.height,
@@ -214,26 +220,31 @@ class MyYearPickerState extends State<MyYearPicker> {
             /// Header showing year range.
             Container(
               width: widget.width,
-              alignment: widget.pickerDecoration?.headerDecoration?.alignment ??
+              alignment:
+                  widget.pickerDecoration?.headerDecoration?.alignment ??
                   Alignment.center,
-              margin: widget.pickerDecoration?.headerDecoration?.headerMargin ??
+              margin:
+                  widget.pickerDecoration?.headerDecoration?.headerMargin ??
                   EdgeInsets.zero,
               padding:
                   widget.pickerDecoration?.headerDecoration?.headerPadding ??
-                      EdgeInsets.all(10),
+                  EdgeInsets.all(10),
               decoration:
                   widget.pickerDecoration?.headerDecoration?.headerDecoration ??
-                      BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
-                      ),
+                  BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                  ),
               child: Text(
                 "${(widget.firstDate?.year ?? 1900)} - ${(widget.lastDate?.year ?? 2100)}",
-                style: widget
-                        .pickerDecoration?.headerDecoration?.headerTextStyle ??
+                style:
+                    widget
+                        .pickerDecoration
+                        ?.headerDecoration
+                        ?.headerTextStyle ??
                     TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -262,17 +273,24 @@ class MyYearPickerState extends State<MyYearPicker> {
                   return Focus(
                     focusNode: monthFocusNodes[index],
                     child: InkWell(
-                      hoverColor: widget
-                              .pickerDecoration?.monthDecoration?.hoverColor ??
+                      hoverColor:
+                          widget
+                              .pickerDecoration
+                              ?.monthDecoration
+                              ?.hoverColor ??
                           Colors.transparent,
-                      focusColor: widget
-                              .pickerDecoration?.monthDecoration?.focusColor ??
+                      focusColor:
+                          widget
+                              .pickerDecoration
+                              ?.monthDecoration
+                              ?.focusColor ??
                           Colors.transparent,
                       onTap: () {
                         setState(() {
                           selectedYear = year;
                           widget.onDateChanged(
-                              DateTime(selectedYear, selectedMonth, 1));
+                            DateTime(selectedYear, selectedMonth, 1),
+                          );
                         });
                       },
                       child: Container(
@@ -312,10 +330,7 @@ class MyYearPickerState extends State<MyYearPicker> {
           );
     } else {
       return widget.pickerDecoration?.monthDecoration?.unSelectedTextStyle ??
-          const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.normal,
-          );
+          const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
     }
   }
 

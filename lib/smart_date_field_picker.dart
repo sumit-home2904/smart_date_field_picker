@@ -143,7 +143,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                       widget.controller.hide();
                     }
                   },
-                )
+                ),
               ],
             ),
           ),
@@ -191,7 +191,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                 widget.pickerDecoration?.cursorErrorColor ?? Colors.black,
             enableInteractiveSelection:
                 widget.pickerDecoration?.enableInteractiveSelection ??
-                    (!(widget.fieldReadOnly ?? false)),
+                (!(widget.fieldReadOnly ?? false)),
           ),
         ),
       ),
