@@ -1,0 +1,29 @@
+name: smart_date_field_picker
+description: A customizable Flutter time picker with TextFormField, supporting 12/24-hour formats, smart input, keyboard navigation, and full theming.
+homepage: https://github.com/sumit-home2904/smart_time_field_picker/tree/main/example
+repository: https://github.com/sumit-home2904/smart_time_field_picker
+issue_tracker: https://github.com/sumit-home2904/smart_time_field_picker/issues
+Publisher: Sumit Sharma
+license: MIT
+
+version: 0.0.1
+
+environment:
+  sdk: ^3.5.3
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  mask_text_input_formatter: ^2.9.0
+  intl: ^0.20.2
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+
+flutter:
+  uses-material-design: true
