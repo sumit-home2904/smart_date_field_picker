@@ -178,7 +178,6 @@ class MyYearPickerState extends State<MyYearPicker> {
 
   void scrollToFocusedItem() {
     final RenderBox? itemRenderBox = itemListKey[focusedIndex].currentContext?.findRenderObject() as RenderBox?;
-    print(itemRenderBox);
     if (itemRenderBox == null) return;
 
     const int crossAxisCount = 3; // Keep in sync with your GridView column count
@@ -196,12 +195,9 @@ class MyYearPickerState extends State<MyYearPicker> {
     final double firstVisibleRow = currentScrollOffset / itemHeight;
     final double lastVisibleRow = firstVisibleRow + maxVisibleRows - 1;
 
-    // print("focusedRow  $focusedRow");
-    // print("lastVisibleRow  $lastVisibleRow");
     // Scroll if focused row is outside visible range
     if (focusedRow > lastVisibleRow) {
       final double targetOffset = (focusedRow - maxVisibleRows + 1) * itemHeight;
-      // print("targetOffset 1 $targetOffset");
       scrollController.animateTo(
         targetOffset,
         duration: const Duration(milliseconds: 100),
@@ -209,7 +205,6 @@ class MyYearPickerState extends State<MyYearPicker> {
       );
     } else if (focusedRow < firstVisibleRow) {
       final double targetOffset = focusedRow * itemHeight;
-      // print("targetOffset 2 $targetOffset");
 
       scrollController.animateTo(
         targetOffset,
@@ -343,7 +338,6 @@ class MyYearPickerState extends State<MyYearPicker> {
                       index == widget.currentDisplayDate.year - 1;
                   final isFocused = index == focusMonthIndex;
 
-                  // print("isSelected ----> $isFocused");
                   return Focus(
                     key:  itemListKey[index],
                     focusNode: monthFocusNodes[index],
