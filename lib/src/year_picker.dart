@@ -6,10 +6,10 @@ import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 /// Used for selecting a year within a range from [firstDate] to [lastDate].
 class MyYearPicker extends StatefulWidget {
   /// The last selectable date.
-  final DateTime? lastDate;
+  final DateTime lastDate;
 
   /// The first selectable date.
-  final DateTime? firstDate;
+  final DateTime firstDate;
 
   /// The width of the picker.
   final double width;
@@ -30,8 +30,8 @@ class MyYearPicker extends StatefulWidget {
   final PickerDecoration? pickerDecoration;
 
   const MyYearPicker({
-    this.lastDate,
-    this.firstDate,
+    required this.lastDate,
+    required this.firstDate,
     required this.width,
     required this.height,
     this.pickerDecoration,
@@ -61,29 +61,21 @@ class MyYearPickerState extends State<MyYearPicker> {
   List<int> yearList = [];
 
   late List<GlobalKey> itemListKey = [];
+
   @override
   void initState() {
     super.initState();
 
-    scrollController.addListener(() {
-      if (monthFocusNodes[focusedIndex].hasFocus == false &&
-          focusedIndex >= 0 &&
-          focusedIndex < monthFocusNodes.length) {
-        monthFocusNodes[focusedIndex].requestFocus();
-      }
-    });
-
-
     yearList = List.generate(
-      (widget.lastDate?.year ?? 2100) - (widget.firstDate?.year ?? 1900) + 1,
-          (i) => (widget.firstDate?.year ?? 1900) + i,
+      (widget.lastDate.year) - (widget.firstDate.year) + 1,
+          (i) => (widget.firstDate.year) + i,
     );
 
     selectedYear = widget.initialDate.year;
     selectedMonth = widget.initialDate.month;
 
-    int startYear = widget.firstDate?.year ?? 1900;
-    int endYear = widget.lastDate?.year ?? 2100;
+    int startYear = widget.firstDate.year;
+    int endYear = widget.lastDate.year;
     int totalYears = endYear - startYear + 1;
 
     monthFocusNodes = List.generate(totalYears, (_) => FocusNode());
@@ -98,6 +90,15 @@ class MyYearPickerState extends State<MyYearPicker> {
       monthFocusNodes[focusMonthIndex].requestFocus();
       scrollToFocusedItem();
 
+      setState(() {});
+    });
+
+    scrollController.addListener(() {
+      if (monthFocusNodes[focusedIndex].hasFocus == false &&
+          focusedIndex >= 0 &&
+          focusedIndex < monthFocusNodes.length) {
+        monthFocusNodes[focusedIndex].requestFocus();
+      }
     });
   }
 
@@ -108,15 +109,15 @@ class MyYearPickerState extends State<MyYearPicker> {
 
     if (widget.firstDate != oldWidget.firstDate || widget.lastDate != oldWidget.lastDate) {
       yearList = List.generate(
-        (widget.lastDate?.year ?? 2100) - (widget.firstDate?.year ?? 1900) + 1,
-            (i) => (widget.firstDate?.year ?? 1900) + i,
+        (widget.lastDate.year) - (widget.firstDate.year) + 1,
+            (i) => (widget.firstDate.year) + i,
       );
 
       selectedYear = widget.initialDate.year;
       selectedMonth = widget.initialDate.month;
 
-      int startYear = widget.firstDate?.year ?? 1900;
-      int endYear = widget.lastDate?.year ?? 2100;
+      int startYear = widget.firstDate.year;
+      int endYear = widget.lastDate.year;
       int totalYears = endYear - startYear + 1;
 
       monthFocusNodes = List.generate(totalYears, (_) => FocusNode());
@@ -126,7 +127,7 @@ class MyYearPickerState extends State<MyYearPicker> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         monthFocusNodes[focusMonthIndex].requestFocus();
-        scrollToFocusedItem(); // 👈 Ensure focused year is visible
+        scrollToFocusedItem();
       });
     }
   }
@@ -226,7 +227,7 @@ class MyYearPickerState extends State<MyYearPicker> {
         /// Tab key toggles focus on the grid.
         LogicalKeySet(LogicalKeyboardKey.tab): () {
           final currentYear = widget.currentDisplayDate.year;
-          final startYear = widget.firstDate?.year ?? 1900;
+          final startYear = widget.firstDate.year;
           final index = currentYear - startYear;
 
           final fallbackIndex = (index >= 0 && index < monthFocusNodes.length)
@@ -310,7 +311,7 @@ class MyYearPickerState extends State<MyYearPicker> {
                     ),
                   ),
               child: Text(
-                "${(widget.firstDate?.year ?? 1900)} - ${(widget.lastDate?.year ?? 2100)}",
+                "${(widget.firstDate.year)} - ${(widget.lastDate.year)}",
                 style:
                     widget
                         .pickerDecoration
@@ -337,11 +338,12 @@ class MyYearPickerState extends State<MyYearPicker> {
                   childAspectRatio: (widget.width / 2.5) / (widget.height / 4),
                 ),
                 itemBuilder: (context, index) {
-                  int year = (widget.firstDate?.year ?? 1900) + index;
+                  int year = (widget.firstDate.year) + index;
                   final isSelected =
                       index == widget.currentDisplayDate.year - 1;
                   final isFocused = index == focusMonthIndex;
 
+                  // print("isSelected ----> $isFocused");
                   return Focus(
                     key:  itemListKey[index],
                     focusNode: monthFocusNodes[index],

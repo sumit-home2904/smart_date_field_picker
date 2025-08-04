@@ -49,6 +49,35 @@ final OverlayPortalController controller = OverlayPortalController();
 DateTime selectedDate = DateTime.now();
 ```
 
+# Year Range Setup for Custom Year Picker
+
+This logic dynamically generates a 12-year range for a custom `MyYearPicker` widget in Flutter.  
+It ensures the widget works even when `firstDate` or `lastDate` is not provided.
+
+---
+
+## How It Works
+
+The `_setupYearRange` function determines the start (`firstDate`) and end (`lastDate`) of the year range based on the following rules:
+
+1. **No `firstDate` and `lastDate` provided**
+    - Generates 12 years centered around `initialDate`.
+    - Range: 6 years before and 5 years after `initialDate`.
+    - Example: `initialDate = 2025` → Range: `2019 - 2030`.
+
+2. **Only `firstDate` provided**
+    - Generates 12 years starting from `firstDate`.
+    - Example: `firstDate = 2020` → Range: `2020 - 2031`.
+
+3. **Only `lastDate` provided**
+    - Generates 12 years ending at `lastDate`.
+    - Example: `lastDate = 2030` → Range: `2019 - 2030`.
+
+4. **Both `firstDate` and `lastDate` provided**
+    - Uses the given range without modification.
+
+---
+
 ```dart
 SmartDateFieldPicker(
   initialDate: selectedDate,

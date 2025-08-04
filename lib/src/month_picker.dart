@@ -6,12 +6,6 @@ import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 /// A custom month picker widget that shows all 12 months in a grid layout
 /// with keyboard navigation and styling support through [PickerDecoration].
 class MyMonthPicker extends StatefulWidget {
-  /// The last selectable date.
-  final DateTime? lastDate;
-
-  /// The first selectable date.
-  final DateTime? firstDate;
-
   /// The initially selected date.
   final DateTime initialDate;
 
@@ -34,8 +28,7 @@ class MyMonthPicker extends StatefulWidget {
   final double width;
 
   const MyMonthPicker({
-    this.lastDate,
-    this.firstDate,
+
     required this.width,
     required this.height,
     this.pickerDecoration,

@@ -24,10 +24,10 @@ class OverlayBuilder extends StatefulWidget {
   final DateTime? initialDate;
 
   /// The earliest selectable date.
-  final DateTime? firstDate;
+  final DateTime firstDate;
 
   /// The latest selectable date.
-  final DateTime? lastDate;
+  final DateTime lastDate;
 
   /// Customization options for the picker UI.
   final PickerDecoration? pickerDecoration;
@@ -41,13 +41,13 @@ class OverlayBuilder extends StatefulWidget {
   /// Creates an instance of [OverlayBuilder].
   const OverlayBuilder({
     super.key,
-    this.lastDate,
     this.renderBox,
-    this.firstDate,
     this.dropdownOffset,
     this.pickerDecoration,
-    required this.controller,
+    required this.lastDate,
+    required this.firstDate,
     required this.layerLink,
+    required this.controller,
     required this.initialDate,
     required this.onDateSelected,
     required this.textController,
@@ -418,8 +418,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Checks if user can navigate to the previous month based on `firstDate` constraint.
   bool _canNavigateToPreviousMonth() {
-    if (widget.firstDate == null) return true;
-
     DateTime firstOfMonth = DateTime(
       _currentDisplayDate.year,
       _currentDisplayDate.month,
@@ -432,7 +430,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     );
 
     return !firstOfPreviousMonth.isBefore(
-      DateTime(widget.firstDate!.year, widget.firstDate!.month, 1),
+      DateTime(widget.firstDate.year, widget.firstDate.month, 1),
     );
   }
 
@@ -456,8 +454,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Checks if user can navigate to the next month based on `lastDate` constraint.
   bool _canNavigateToNextMonth() {
-    if (widget.lastDate == null) return true;
-
     DateTime firstOfMonth = DateTime(
       _currentDisplayDate.year,
       _currentDisplayDate.month,
@@ -470,7 +466,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     );
 
     return !firstOfNextMonth.isAfter(
-      DateTime(widget.lastDate!.year, widget.lastDate!.month, 1),
+      DateTime(widget.lastDate.year, widget.lastDate.month, 1),
     );
   }
 
@@ -649,7 +645,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           dateFocusNode.requestFocus();
           if (dateFocusNode.hasFocus && currentIndex > 0) {
             final prevDate = calendarDays[currentIndex - 1];
-            if (!prevDate.isBefore(widget.firstDate ?? DateTime(1900))) {
+            if (!prevDate.isBefore(widget.firstDate)) {
               setState(() {
                 focusSelectedDate = prevDate;
                 if (prevDate.month != _currentDisplayDate.month) {
@@ -665,8 +661,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             );
             if (!prevMonth.isBefore(
               DateTime(
-                widget.firstDate?.year ?? 1900,
-                widget.firstDate?.month ?? 1,
+                widget.firstDate.year,
+                widget.firstDate.month,
                 1,
               ),
             )) {
@@ -681,7 +677,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           if (dateFocusNode.hasFocus &&
               currentIndex < calendarDays.length - 1) {
             final nextDate = calendarDays[currentIndex + 1];
-            if (!nextDate.isAfter(widget.lastDate ?? DateTime(2100))) {
+            if (!nextDate.isAfter(widget.lastDate)) {
               setState(() {
                 focusSelectedDate = nextDate;
                 if (nextDate.month != _currentDisplayDate.month) {
@@ -696,7 +692,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               1,
             );
             if (!nextMonth.isAfter(
-              DateTime(widget.lastDate?.year ?? 2100, 12, 31),
+              DateTime(widget.lastDate.year, 12, 31),
             )) {
               moveFocusLeftRightAdjacentMonth(1, currentIndex, nextMonth);
             }
@@ -710,7 +706,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             int targetIndex = currentIndex - 7;
             if (targetIndex >= 0) {
               final targetDate = calendarDays[targetIndex];
-              if (!targetDate.isBefore(widget.firstDate ?? DateTime(1900))) {
+              if (!targetDate.isBefore(widget.firstDate)) {
                 setState(() {
                   focusSelectedDate = targetDate;
                   if (targetDate.month != _currentDisplayDate.month ||
@@ -730,8 +726,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               );
               if (!prevMonth.isBefore(
                 DateTime(
-                  widget.firstDate?.year ?? 1900,
-                  widget.firstDate?.month ?? 1,
+                  widget.firstDate.year,
+                  widget.firstDate.month,
                   1,
                 ),
               )) {
@@ -747,7 +743,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           if (dateFocusNode.hasFocus &&
               currentIndex + 7 < calendarDays.length) {
             final targetDate = calendarDays[currentIndex + 7];
-            if (!targetDate.isAfter(widget.lastDate ?? DateTime(2100))) {
+            if (!targetDate.isAfter(widget.lastDate)) {
               setState(() {
                 focusSelectedDate = targetDate;
                 if (targetDate.month != _currentDisplayDate.month) {
@@ -765,9 +761,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               1,
             );
             final lastAllowedDate = DateTime(
-              widget.lastDate?.year ?? 2100,
-              12,
-              31,
+              widget.lastDate.year, 12, 31,
             );
             if (!nextMonth.isAfter(lastAllowedDate)) {
               moveFocusToAdjacentMonth(1, currentIndex, nextMonth);
@@ -954,9 +948,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Checks if the given [date] is within the allowed [firstDate] and [lastDate] range.
   bool _isValidDate(DateTime date) {
-    if (widget.firstDate != null && date.isBefore(widget.firstDate!))
+    if (date.isBefore(widget.firstDate)) {
       return false;
-    if (widget.lastDate != null && date.isAfter(widget.lastDate!)) return false;
+    }
+    if (date.isAfter(widget.lastDate)) return false;
     return true;
   }
 
@@ -1007,8 +1002,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                   if (canShowMonth && !canShowYear)
                     Expanded(
                       child: MyMonthPicker(
-                        lastDate: widget.lastDate,
-                        firstDate: widget.firstDate,
                         initialDate: _currentDisplayDate,
                         pickerDecoration: widget.pickerDecoration,
                         width: widget.pickerDecoration?.width ?? 270,

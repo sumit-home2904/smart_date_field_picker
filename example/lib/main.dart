@@ -34,11 +34,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  OverlayPortalController controller = OverlayPortalController();
-  final _form = GlobalKey<FormState>();
-  DateTime initDate = DateTime.now();
 
+  DateTime initDate = DateTime.now();
+  final _form = GlobalKey<FormState>();
   final dropdownKey = GlobalKey<SmartDateFieldPickerState>();
+  OverlayPortalController controller = OverlayPortalController();
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             SmartDateFieldPicker(
               initialDate: initDate,
-              firstDate: DateTime(2020, 1, 1),
-              lastDate: DateTime(2030, 12, 31),
               controller: controller,
               decoration: InputDecoration(),
               onDateSelected: (value) {

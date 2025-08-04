@@ -97,6 +97,32 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
   /// Formatter to enforce a DD/MM/YYYY date format.
   late final MaskTextInputFormatter maskFormatter;
 
+  late DateTime firstDate;
+  late DateTime lastDate;
+
+  void _setupYearRange() {
+    final currentYear = DateTime.now().year;
+
+    if (widget.firstDate == null && widget.lastDate == null) {
+      // Default: 12 years around initial date (or current year)
+      firstDate = DateTime(currentYear - 6); // 6 before
+      lastDate = DateTime(currentYear + 5);  // 5 after (total 12 years)
+    } else if (widget.firstDate != null && widget.lastDate == null) {
+      // 12 years from firstDate
+      firstDate = widget.firstDate!;
+      lastDate = DateTime(firstDate.year + 11);
+    } else if (widget.firstDate == null && widget.lastDate != null) {
+      // 12 years ending at lastDate
+      lastDate = widget.lastDate!;
+      firstDate = DateTime(lastDate.year - 11);
+    } else {
+      // Use provided range
+      firstDate = widget.firstDate!;
+      lastDate = widget.lastDate!;
+    }
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -107,6 +133,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
       filter: {"#": RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy,
     );
+    _setupYearRange();
   }
 
   @override
@@ -130,8 +157,8 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                   key: contentKey,
                   layerLink: layerLink,
                   renderBox: textRenderBox,
-                  lastDate: widget.lastDate,
-                  firstDate: widget.firstDate,
+                  lastDate: lastDate,
+                  firstDate: firstDate,
                   controller: widget.controller,
                   textController: textController,
                   initialDate: widget.initialDate,
