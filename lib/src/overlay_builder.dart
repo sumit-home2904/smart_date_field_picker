@@ -242,14 +242,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   Widget _buildHeader() {
     return Container(
       alignment: widget.pickerDecoration?.headerDecoration?.alignment,
-      margin:
-          widget.pickerDecoration?.headerDecoration?.headerMargin ??
+      margin: widget.pickerDecoration?.headerDecoration?.headerMargin ??
           EdgeInsets.zero,
-      padding:
-          widget.pickerDecoration?.headerDecoration?.headerPadding ??
+      padding: widget.pickerDecoration?.headerDecoration?.headerPadding ??
           EdgeInsets.all(10),
-      decoration:
-          widget.pickerDecoration?.headerDecoration?.headerDecoration ??
+      decoration: widget.pickerDecoration?.headerDecoration?.headerDecoration ??
           BoxDecoration(
             color: Theme.of(context).primaryColor,
             borderRadius: const BorderRadius.only(
@@ -263,45 +260,25 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           /// Left arrow button for navigating to the previous month.
           IconButton(
             focusNode: arrowLeftFocusNode,
-            focusColor:
-                widget
-                    .pickerDecoration
-                    ?.headerDecoration
-                    ?.iconDecoration
-                    ?.focusColor ??
+            focusColor: widget.pickerDecoration?.headerDecoration
+                    ?.iconDecoration?.focusColor ??
                 Colors.white,
-            hoverColor:
-                widget
-                    .pickerDecoration
-                    ?.headerDecoration
-                    ?.iconDecoration
-                    ?.hoverColor ??
+            hoverColor: widget.pickerDecoration?.headerDecoration
+                    ?.iconDecoration?.hoverColor ??
                 Colors.white12,
             icon: Icon(
-              widget
-                      .pickerDecoration
-                      ?.headerDecoration
-                      ?.iconDecoration
+              widget.pickerDecoration?.headerDecoration?.iconDecoration
                       ?.leftIcon ??
                   Icons.chevron_left,
-              size: widget
-                  .pickerDecoration
-                  ?.headerDecoration
-                  ?.iconDecoration
+              size: widget.pickerDecoration?.headerDecoration?.iconDecoration
                   ?.leftIconSize,
               color: arrowLeftFocusNode.hasFocus
-                  ? widget
-                            .pickerDecoration
-                            ?.headerDecoration
-                            ?.iconDecoration
-                            ?.leftFocusIconColor ??
-                        Colors.black
-                  : widget
-                            .pickerDecoration
-                            ?.headerDecoration
-                            ?.iconDecoration
-                            ?.leftIconColor ??
-                        Colors.white,
+                  ? widget.pickerDecoration?.headerDecoration?.iconDecoration
+                          ?.leftFocusIconColor ??
+                      Colors.black
+                  : widget.pickerDecoration?.headerDecoration?.iconDecoration
+                          ?.leftIconColor ??
+                      Colors.white,
             ),
             onPressed: _canNavigateToPreviousMonth() ? _previousMonth : null,
           ),
@@ -313,19 +290,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             color: Colors.transparent,
             child: InkWell(
               focusNode: monthYearFocusNode,
-              focusColor:
-                  widget
-                      .pickerDecoration
-                      ?.headerDecoration
-                      ?.iconDecoration
-                      ?.focusColor ??
+              focusColor: widget.pickerDecoration?.headerDecoration
+                      ?.iconDecoration?.focusColor ??
                   Colors.white,
-              hoverColor:
-                  widget
-                      .pickerDecoration
-                      ?.headerDecoration
-                      ?.iconDecoration
-                      ?.hoverColor ??
+              hoverColor: widget.pickerDecoration?.headerDecoration
+                      ?.iconDecoration?.hoverColor ??
                   Colors.white12,
               borderRadius: BorderRadius.circular(05),
               onTap: () {
@@ -350,45 +319,25 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           /// Right arrow button for navigating to the next month.
           IconButton(
             focusNode: arrowRightFocusNode,
-            focusColor:
-                widget
-                    .pickerDecoration
-                    ?.headerDecoration
-                    ?.iconDecoration
-                    ?.focusColor ??
+            focusColor: widget.pickerDecoration?.headerDecoration
+                    ?.iconDecoration?.focusColor ??
                 Colors.white,
-            hoverColor:
-                widget
-                    .pickerDecoration
-                    ?.headerDecoration
-                    ?.iconDecoration
-                    ?.hoverColor ??
+            hoverColor: widget.pickerDecoration?.headerDecoration
+                    ?.iconDecoration?.hoverColor ??
                 Colors.white12,
             icon: Icon(
-              widget
-                      .pickerDecoration
-                      ?.headerDecoration
-                      ?.iconDecoration
+              widget.pickerDecoration?.headerDecoration?.iconDecoration
                       ?.rightIcon ??
                   Icons.chevron_right,
-              size: widget
-                  .pickerDecoration
-                  ?.headerDecoration
-                  ?.iconDecoration
+              size: widget.pickerDecoration?.headerDecoration?.iconDecoration
                   ?.rightIconSize,
               color: arrowRightFocusNode.hasFocus
-                  ? widget
-                            .pickerDecoration
-                            ?.headerDecoration
-                            ?.iconDecoration
-                            ?.rightFocusIconColor ??
-                        Colors.black
-                  : widget
-                            .pickerDecoration
-                            ?.headerDecoration
-                            ?.iconDecoration
-                            ?.rightIconColor ??
-                        Colors.white,
+                  ? widget.pickerDecoration?.headerDecoration?.iconDecoration
+                          ?.rightFocusIconColor ??
+                      Colors.black
+                  : widget.pickerDecoration?.headerDecoration?.iconDecoration
+                          ?.rightIconColor ??
+                      Colors.white,
             ),
             onPressed: _canNavigateToNextMonth() ? _nextMonth : null,
           ),
@@ -501,11 +450,9 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     final endDate = lastDayOfMonth.add(Duration(days: endOffset));
 
     List<DateTime> days = [];
-    for (
-      DateTime d = startDate;
-      !d.isAfter(endDate);
-      d = d.add(Duration(days: 1))
-    ) {
+    for (DateTime d = startDate;
+        !d.isAfter(endDate);
+        d = d.add(Duration(days: 1))) {
       days.add(d);
     }
     return days;
@@ -761,7 +708,9 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               1,
             );
             final lastAllowedDate = DateTime(
-              widget.lastDate.year, 12, 31,
+              widget.lastDate.year,
+              12,
+              31,
             );
             if (!nextMonth.isAfter(lastAllowedDate)) {
               moveFocusToAdjacentMonth(1, currentIndex, nextMonth);
@@ -779,12 +728,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
               children: List.generate(calendarDays.length, (index) {
                 final date = calendarDays[index];
                 final isCurrentMonth = date.month == _currentDisplayDate.month;
-                final isSelected =
-                    date.year == selectedDate.year &&
+                final isSelected = date.year == selectedDate.year &&
                     date.month == selectedDate.month &&
                     date.day == selectedDate.day;
-                final isFocusDate =
-                    date.year == focusSelectedDate.year &&
+                final isFocusDate = date.year == focusSelectedDate.year &&
                     date.month == focusSelectedDate.month &&
                     date.day == focusSelectedDate.day;
 
@@ -897,8 +844,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             child: Center(
               child: Text(
                 weekday,
-                style:
-                    widget.pickerDecoration?.weekTextStyle ??
+                style: widget.pickerDecoration?.weekTextStyle ??
                     TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ),
@@ -969,16 +915,14 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     return CompositedTransformFollower(
       link: widget.layerLink,
       offset: setOffset(),
-      followerAnchor: displayOverlayBottom
-          ? Alignment.topLeft
-          : Alignment.bottomLeft,
+      followerAnchor:
+          displayOverlayBottom ? Alignment.topLeft : Alignment.bottomLeft,
       child: LayoutBuilder(
         builder: (context, c) {
           return Container(
             key: key1,
             height: widget.pickerDecoration?.height ?? 330,
-            decoration:
-                widget.pickerDecoration?.menuDecoration ??
+            decoration: widget.pickerDecoration?.menuDecoration ??
                 BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),

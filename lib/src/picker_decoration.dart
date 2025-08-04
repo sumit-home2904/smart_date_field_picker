@@ -311,7 +311,6 @@ class MonthDecoration {
   }
 }
 
-
 /// Defines styling for year tiles in the picker.
 class YearDecoration {
   /// Hover color for the cell.
@@ -373,7 +372,6 @@ class YearDecoration {
     );
   }
 }
-
 
 /// Defines styling for individual day tiles in the picker calendar.
 class DayDecoration {

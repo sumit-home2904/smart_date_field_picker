@@ -106,7 +106,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
     if (widget.firstDate == null && widget.lastDate == null) {
       // Default: 12 years around initial date (or current year)
       firstDate = DateTime(currentYear - 6); // 6 before
-      lastDate = DateTime(currentYear + 5);  // 5 after (total 12 years)
+      lastDate = DateTime(currentYear + 5); // 5 after (total 12 years)
     } else if (widget.firstDate != null && widget.lastDate == null) {
       // 12 years from firstDate
       firstDate = widget.firstDate!;
@@ -121,7 +121,6 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
       lastDate = widget.lastDate!;
     }
   }
-
 
   @override
   void initState() {
@@ -218,7 +217,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                 widget.pickerDecoration?.cursorErrorColor ?? Colors.black,
             enableInteractiveSelection:
                 widget.pickerDecoration?.enableInteractiveSelection ??
-                (!(widget.fieldReadOnly ?? false)),
+                    (!(widget.fieldReadOnly ?? false)),
           ),
         ),
       ),
