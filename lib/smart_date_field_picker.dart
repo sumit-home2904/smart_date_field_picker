@@ -5,9 +5,12 @@ export 'smart_date_field_picker.dart';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_date_field_picker/src/overlay_builder.dart';
 import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
+double defaultRadius = 8;
 
 /// A customizable text field widget that allows users to pick a date from a dropdown-style overlay.
 class SmartDateFieldPicker extends StatefulWidget {
@@ -66,7 +69,7 @@ class SmartDateFieldPicker extends StatefulWidget {
     this.autoValidateMode,
     this.pickerDecoration,
     required this.controller,
-    required this.decoration,
+    this.decoration,
     required this.initialDate,
     required this.onDateSelected,
   });
@@ -132,6 +135,11 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
       filter: {"#": RegExp(r'[0-9]')},
       type: MaskAutoCompletionType.lazy,
     );
+
+    if (widget.initialDate != null) {
+      textController.text =
+          DateFormat("dd/MM/yyyy").format(widget.initialDate!);
+    }
     _setupYearRange();
   }
 

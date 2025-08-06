@@ -125,6 +125,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     monthYearFocusNode.addListener(() {
       if (mounted) setState(() {});
     });
+
+    dateFocusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   /// Triggered when the user types in the text field.
@@ -241,12 +245,12 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   /// Builds the calendar/month picker header UI, including navigation arrows and month-year display.
   Widget _buildHeader() {
     return Container(
-      alignment: widget.pickerDecoration?.headerDecoration?.alignment,
-      margin: widget.pickerDecoration?.headerDecoration?.headerMargin ??
-          EdgeInsets.zero,
-      padding: widget.pickerDecoration?.headerDecoration?.headerPadding ??
+      alignment: widget.pickerDecoration?.headerTheme?.alignment,
+      margin:
+          widget.pickerDecoration?.headerTheme?.headerMargin ?? EdgeInsets.zero,
+      padding: widget.pickerDecoration?.headerTheme?.headerPadding ??
           EdgeInsets.all(10),
-      decoration: widget.pickerDecoration?.headerDecoration?.headerDecoration ??
+      decoration: widget.pickerDecoration?.headerTheme?.boxDecoration ??
           BoxDecoration(
             color: Theme.of(context).primaryColor,
             borderRadius: const BorderRadius.only(
@@ -260,23 +264,20 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           /// Left arrow button for navigating to the previous month.
           IconButton(
             focusNode: arrowLeftFocusNode,
-            focusColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.focusColor ??
+            focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ??
                 Colors.white,
-            hoverColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.hoverColor ??
+            hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ??
                 Colors.white12,
             icon: Icon(
-              widget.pickerDecoration?.headerDecoration?.iconDecoration
-                      ?.leftIcon ??
+              widget.pickerDecoration?.headerTheme?.iconDecoration?.leftIcon ??
                   Icons.chevron_left,
-              size: widget.pickerDecoration?.headerDecoration?.iconDecoration
-                  ?.leftIconSize,
+              size: widget
+                  .pickerDecoration?.headerTheme?.iconDecoration?.leftIconSize,
               color: arrowLeftFocusNode.hasFocus
-                  ? widget.pickerDecoration?.headerDecoration?.iconDecoration
+                  ? widget.pickerDecoration?.headerTheme?.iconDecoration
                           ?.leftFocusIconColor ??
                       Colors.black
-                  : widget.pickerDecoration?.headerDecoration?.iconDecoration
+                  : widget.pickerDecoration?.headerTheme?.iconDecoration
                           ?.leftIconColor ??
                       Colors.white,
             ),
@@ -290,13 +291,13 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             color: Colors.transparent,
             child: InkWell(
               focusNode: monthYearFocusNode,
-              focusColor: widget.pickerDecoration?.headerDecoration
-                      ?.iconDecoration?.focusColor ??
+              focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ??
                   Colors.white,
-              hoverColor: widget.pickerDecoration?.headerDecoration
-                      ?.iconDecoration?.hoverColor ??
+              hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ??
                   Colors.white12,
-              borderRadius: BorderRadius.circular(05),
+              borderRadius: BorderRadius.circular(
+                  widget.pickerDecoration?.pickerTheme?.hoverRadius ??
+                      defaultRadius),
               onTap: () {
                 setState(() {
                   canShowDate = !canShowDate;
@@ -319,23 +320,20 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           /// Right arrow button for navigating to the next month.
           IconButton(
             focusNode: arrowRightFocusNode,
-            focusColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.focusColor ??
+            focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ??
                 Colors.white,
-            hoverColor: widget.pickerDecoration?.headerDecoration
-                    ?.iconDecoration?.hoverColor ??
+            hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ??
                 Colors.white12,
             icon: Icon(
-              widget.pickerDecoration?.headerDecoration?.iconDecoration
-                      ?.rightIcon ??
+              widget.pickerDecoration?.headerTheme?.iconDecoration?.rightIcon ??
                   Icons.chevron_right,
-              size: widget.pickerDecoration?.headerDecoration?.iconDecoration
-                  ?.rightIconSize,
+              size: widget
+                  .pickerDecoration?.headerTheme?.iconDecoration?.rightIconSize,
               color: arrowRightFocusNode.hasFocus
-                  ? widget.pickerDecoration?.headerDecoration?.iconDecoration
+                  ? widget.pickerDecoration?.headerTheme?.iconDecoration
                           ?.rightFocusIconColor ??
                       Colors.black
-                  : widget.pickerDecoration?.headerDecoration?.iconDecoration
+                  : widget.pickerDecoration?.headerTheme?.iconDecoration
                           ?.rightIconColor ??
                       Colors.white,
             ),
@@ -349,14 +347,14 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   /// Returns appropriate text style based on whether the month/year button is focused.
   TextStyle headerStyle() {
     if (monthYearFocusNode.hasFocus) {
-      return widget.pickerDecoration?.headerDecoration?.focusTextStyle ??
+      return widget.pickerDecoration?.headerTheme?.focusTextStyle ??
           TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           );
     } else {
-      return widget.pickerDecoration?.headerDecoration?.headerTextStyle ??
+      return widget.pickerDecoration?.headerTheme?.headerTextStyle ??
           TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -733,18 +731,23 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                     date.day == selectedDate.day;
                 final isFocusDate = date.year == focusSelectedDate.year &&
                     date.month == focusSelectedDate.month &&
-                    date.day == focusSelectedDate.day;
+                    date.day == focusSelectedDate.day &&
+                    dateFocusNode.hasFocus;
 
-                return Theme(
-                  data: Theme.of(context).copyWith(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    hoverColor: Colors.transparent,
-                    focusColor: Colors.transparent,
-                  ),
+                return Material(
+                  color: Colors.transparent,
                   child: Focus(
                     focusNode: dateFocusNode,
                     child: InkWell(
+                      focusColor:
+                          widget.pickerDecoration?.pickerTheme?.focusColor ??
+                              Colors.white,
+                      hoverColor:
+                          widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                              Colors.white12,
+                      borderRadius: BorderRadius.circular(
+                          widget.pickerDecoration?.pickerTheme?.hoverRadius ??
+                              defaultRadius),
                       onTap: () {
                         setState(() {
                           focusSelectedDate = date;
@@ -785,28 +788,34 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     bool isFocusDate,
     bool isSelected,
   ) {
-    if (isCurrentMonth && isSelected) {
-      return widget.pickerDecoration?.dayDecoration?.selectedDecoration ??
-          BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(6),
-          );
-    }
-    if (!isCurrentMonth && !isSelected) {
-      return widget.pickerDecoration?.dayDecoration?.unSelectedDecoration ??
-          BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
-          );
-    }
+    // If the current date is also focused → show focusDecoration
     if (isFocusDate) {
-      return widget.pickerDecoration?.dayDecoration?.focusDecoration ??
+      return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
           BoxDecoration(
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: Theme.of(context).primaryColor),
           );
     }
+
+    // Selected date in current month
+    if (isCurrentMonth && isSelected) {
+      return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
+          BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(6),
+          );
+    }
+
+    // Unselected date outside current month
+    if (!isCurrentMonth && !isSelected) {
+      return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
+          BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          );
+    }
+
     return BoxDecoration();
   }
 
@@ -816,21 +825,27 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     bool isFocusDate,
     bool isSelected,
   ) {
-    if (isCurrentMonth) {
-      if (isSelected) {
-        return widget.pickerDecoration?.dayDecoration?.selectedTextStyle ??
-            TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
-      } else if (isFocusDate) {
-        return widget.pickerDecoration?.dayDecoration?.focusTextStyle ??
-            TextStyle(color: Theme.of(context).primaryColor);
-      } else {
-        return widget.pickerDecoration?.dayDecoration?.unSelectedTextStyle ??
-            TextStyle(color: Colors.black);
-      }
-    } else {
-      return widget.pickerDecoration?.dayDecoration?.disableTextStyle ??
-          TextStyle(color: Colors.grey);
+    // Focus takes highest priority (even if it's the current date or selected)
+    if (isFocusDate) {
+      return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
+          TextStyle(color: Theme.of(context).primaryColor);
     }
+
+    // Selected date in current month
+    if (isCurrentMonth && isSelected) {
+      return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
+          TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+    }
+
+    // Unselected date in current month
+    if (isCurrentMonth) {
+      return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
+          TextStyle(color: Colors.black);
+    }
+
+    // Disabled (dates outside current month)
+    return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
+        TextStyle(color: Colors.grey);
   }
 
   /// Builds headers for weekdays (Mon, Tue, etc.) aligned with the calendar grid.
@@ -946,11 +961,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                   if (canShowMonth && !canShowYear)
                     Expanded(
                       child: MyMonthPicker(
-                        initialDate: _currentDisplayDate,
                         pickerDecoration: widget.pickerDecoration,
                         width: widget.pickerDecoration?.width ?? 270,
                         height: widget.pickerDecoration?.height ?? 320,
-                        currentDisplayDate: _currentDisplayDate,
+                        currentDisplayDate: focusSelectedDate,
                         changeToYearPicker: () {
                           setState(() {
                             canShowYear = true;
@@ -960,6 +974,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                           setState(() {
                             _currentDisplayDate = date;
                             focusSelectedDate = date;
+                            print(date);
                             dateFocusNode.requestFocus();
                             canShowMonth = false;
                             canShowDate = true;

@@ -287,26 +287,23 @@ class MyYearPickerState extends State<MyYearPicker> {
             /// Header showing year range.
             Container(
               width: widget.width,
-              alignment: widget.pickerDecoration?.headerDecoration?.alignment ??
+              alignment: widget.pickerDecoration?.headerTheme?.alignment ??
                   Alignment.center,
-              margin: widget.pickerDecoration?.headerDecoration?.headerMargin ??
+              margin: widget.pickerDecoration?.headerTheme?.headerMargin ??
                   EdgeInsets.zero,
-              padding:
-                  widget.pickerDecoration?.headerDecoration?.headerPadding ??
-                      EdgeInsets.all(10),
-              decoration:
-                  widget.pickerDecoration?.headerDecoration?.headerDecoration ??
-                      BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
-                      ),
+              padding: widget.pickerDecoration?.headerTheme?.headerPadding ??
+                  EdgeInsets.all(10),
+              decoration: widget.pickerDecoration?.headerTheme?.boxDecoration ??
+                  BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                  ),
               child: Text(
                 "${(widget.firstDate.year)} - ${(widget.lastDate.year)}",
-                style: widget
-                        .pickerDecoration?.headerDecoration?.headerTextStyle ??
+                style: widget.pickerDecoration?.headerTheme?.headerTextStyle ??
                     TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -319,54 +316,76 @@ class MyYearPickerState extends State<MyYearPicker> {
 
             /// Grid of year options
             Expanded(
-              child: GridView.builder(
-                controller: scrollController,
-                physics: const ClampingScrollPhysics(),
-                itemCount: yearList.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: (widget.width / 2.5) / (widget.height / 4),
-                ),
-                itemBuilder: (context, index) {
-                  int year = (widget.firstDate.year) + index;
-                  final isSelected =
-                      index == widget.currentDisplayDate.year - 1;
-                  final isFocused = index == focusMonthIndex;
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  // Define desired item width
+                  const double itemWidth = 90;
 
-                  return Focus(
-                    key: itemListKey[index],
-                    focusNode: monthFocusNodes[index],
-                    autofocus: focusedIndex == index,
-                    child: InkWell(
-                      hoverColor:
-                          widget.pickerDecoration?.yearDecoration?.hoverColor ??
-                              Colors.transparent,
-                      focusColor:
-                          widget.pickerDecoration?.yearDecoration?.focusColor ??
-                              Colors.transparent,
-                      onTap: () {
-                        setState(() {
-                          selectedYear = year;
-                          widget.onDateChanged(
-                            DateTime(selectedYear, selectedMonth, 1),
-                          );
-                        });
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(4),
-                        decoration: yearDecoration(isSelected, isFocused),
-                        child: Center(
-                          child: Text(
-                            year.toString(),
-                            style: monthStyle(isSelected, isFocused),
+                  // Calculate how many items can fit
+                  int crossAxisCount =
+                      (constraints.maxWidth / itemWidth).floor().clamp(1, 10);
+
+                  return GridView.builder(
+                    controller: scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    itemCount: yearList.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      childAspectRatio:
+                          (widget.width / 2.5) / (widget.height / 4),
+                    ),
+                    itemBuilder: (context, index) {
+                      int year = widget.firstDate.year + index;
+                      final isSelected =
+                          yearList[index] == widget.currentDisplayDate.year;
+                      final isFocused = index == focusMonthIndex;
+
+                      return Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Focus(
+                            key: itemListKey[index],
+                            focusNode: monthFocusNodes[index],
+                            autofocus: focusedIndex == index,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(widget
+                                      .pickerDecoration
+                                      ?.pickerTheme
+                                      ?.hoverRadius ??
+                                  defaultRadius),
+                              hoverColor: widget.pickerDecoration?.pickerTheme
+                                      ?.hoverColor ??
+                                  Colors.transparent,
+                              focusColor: widget.pickerDecoration?.pickerTheme
+                                      ?.focusColor ??
+                                  Colors.transparent,
+                              onTap: () {
+                                setState(() {
+                                  selectedYear = year;
+                                  widget.onDateChanged(
+                                      DateTime(selectedYear, selectedMonth, 1));
+                                });
+                              },
+                              child: Container(
+                                decoration:
+                                    yearDecoration(isSelected, isFocused),
+                                child: Center(
+                                  child: Text(
+                                    year.toString(),
+                                    style: yearStyle(isSelected, isFocused),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -374,21 +393,21 @@ class MyYearPickerState extends State<MyYearPicker> {
   }
 
   /// Returns the text style for each year tile.
-  TextStyle monthStyle(bool isSelected, bool isFocused) {
-    if (isFocused && !isSelected) {
-      return widget.pickerDecoration?.yearDecoration?.disableTextStyle ??
+  TextStyle yearStyle(bool isSelected, bool isFocused) {
+    if (isFocused) {
+      return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
           TextStyle(
             color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.normal,
+            fontWeight: FontWeight.bold,
           );
     } else if (isSelected) {
-      return widget.pickerDecoration?.yearDecoration?.selectedTextStyle ??
+      return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
           TextStyle(
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           );
     } else {
-      return widget.pickerDecoration?.yearDecoration?.unSelectedTextStyle ??
+      return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
           const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
     }
   }
@@ -396,22 +415,22 @@ class MyYearPickerState extends State<MyYearPicker> {
   /// Returns the decoration for each year tile depending on focus/selection.
   BoxDecoration yearDecoration(bool isSelected, bool isFocused) {
     if (isFocused) {
-      return widget.pickerDecoration?.yearDecoration?.focusDecoration ??
+      return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
           BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(defaultRadius),
             border: Border.all(color: Theme.of(context).primaryColor, width: 2),
           );
     } else if (isSelected) {
-      return widget.pickerDecoration?.yearDecoration?.selectedDecoration ??
+      return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
           BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(defaultRadius),
             border: Border.all(color: Theme.of(context).primaryColor),
           );
     } else {
-      return widget.pickerDecoration?.yearDecoration?.unSelectedDecoration ??
+      return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
           BoxDecoration(
             color: Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(defaultRadius),
             border: Border.all(color: Colors.grey[300]!),
           );
     }

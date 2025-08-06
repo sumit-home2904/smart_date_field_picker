@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Defines styling and behavior configuration for the overall date picker UI.
+/// Defines overall configuration for the date picker UI.
+///
+/// Now delegates all styling (text and decoration) to [PickerTheme].
 class PickerDecoration {
   /// Whether the cursor should be visible.
   final bool? showCursor;
-
-  /// Color when a cell or field is hovered.
-  final Color? hoverColor;
-
-  /// Color when a cell or field is focused.
-  final Color? focusColor;
 
   /// Color of the cursor in text input.
   final Color? cursorColor;
@@ -17,19 +13,19 @@ class PickerDecoration {
   /// Width of the cursor in text input.
   final double? cursorWidth;
 
-  /// Radius of the cursor (rounded edges).
+  /// Radius of the cursor for rounded edges.
   final Radius? cursorRadius;
 
-  /// The general text style applied to input or cells.
+  /// General text style for input fields (not cells).
   final TextStyle? textStyle;
 
-  /// Fixed height for the input or picker area.
+  /// Fixed height and width of the picker area.
   final double? height, width;
 
   /// Custom height of the cursor.
   final double? cursorHeight;
 
-  /// Text alignment within input fields.
+  /// Alignment for text in input fields.
   final TextAlign? textAlign;
 
   /// Cursor color when there's an error.
@@ -41,62 +37,50 @@ class PickerDecoration {
   /// Decoration for dropdowns or overlays.
   final Decoration? menuDecoration;
 
-  /// Styling configuration for individual day cells.
-  final DayDecoration? dayDecoration;
-
-  /// Styling configuration for month/year cells.
-  final MonthDecoration? monthDecoration;
-
-  /// Enables or disables selection features like long press copy/paste.
+  /// Enables or disables text selection features (long press, copy/paste).
   final bool? enableInteractiveSelection;
 
   /// Styling configuration for the header section.
-  final HeaderDecoration? headerDecoration;
+  final HeaderTheme? headerTheme;
 
-  final YearDecoration? yearDecoration;
+  /// Unified styling for cells (day, month, year).
+  final PickerTheme? pickerTheme;
+
   const PickerDecoration({
     this.width,
     this.height,
     this.textStyle,
     this.textAlign,
     this.showCursor,
-    this.hoverColor,
-    this.focusColor,
     this.cursorColor,
     this.cursorWidth,
     this.cursorHeight,
     this.cursorRadius,
-    this.dayDecoration,
     this.weekTextStyle,
     this.menuDecoration,
-    this.monthDecoration,
     this.cursorErrorColor,
-    this.headerDecoration,
-    this.yearDecoration,
+    this.headerTheme,
     this.enableInteractiveSelection,
+    this.pickerTheme,
   });
 
   /// Creates a copy of this decoration with overridden fields.
   PickerDecoration copyWith({
     bool? showCursor,
-    Color? hoverColor,
-    Color? focusColor,
     Color? cursorColor,
     TextAlign? textAlign,
     TextStyle? textStyle,
     double? cursorWidth,
     double? height,
-    width,
+    double? width,
     Radius? cursorRadius,
     double? cursorHeight,
     Color? cursorErrorColor,
     TextStyle? weekTextStyle,
     Decoration? menuDecoration,
-    DayDecoration? dayDecoration,
-    YearDecoration? yearDecoration,
-    MonthDecoration? monthDecoration,
     bool? enableInteractiveSelection,
-    HeaderDecoration? headerDecoration,
+    HeaderTheme? headerTheme,
+    PickerTheme? pickerTheme,
   }) {
     return PickerDecoration(
       width: width ?? this.width,
@@ -104,116 +88,76 @@ class PickerDecoration {
       textStyle: textStyle ?? this.textStyle,
       textAlign: textAlign ?? this.textAlign,
       showCursor: showCursor ?? this.showCursor,
-      hoverColor: hoverColor ?? this.hoverColor,
-      focusColor: focusColor ?? this.focusColor,
       cursorColor: cursorColor ?? this.cursorColor,
       cursorWidth: cursorWidth ?? this.cursorWidth,
       cursorRadius: cursorRadius ?? this.cursorRadius,
       cursorHeight: cursorHeight ?? this.cursorHeight,
-      dayDecoration: dayDecoration ?? this.dayDecoration,
       weekTextStyle: weekTextStyle ?? this.weekTextStyle,
-      yearDecoration: yearDecoration ?? this.yearDecoration,
       menuDecoration: menuDecoration ?? this.menuDecoration,
-      monthDecoration: monthDecoration ?? this.monthDecoration,
       cursorErrorColor: cursorErrorColor ?? this.cursorErrorColor,
-      headerDecoration: headerDecoration ?? this.headerDecoration,
+      headerTheme: headerTheme ?? this.headerTheme,
       enableInteractiveSelection:
           enableInteractiveSelection ?? this.enableInteractiveSelection,
+      pickerTheme: pickerTheme ?? this.pickerTheme,
     );
   }
 }
 
 /// Defines styling for the header area of the picker.
-class HeaderDecoration {
-  /// Text style for the header (default state).
+class HeaderTheme {
   final TextStyle? headerTextStyle;
-
-  /// Text style when the header is focused.
   final TextStyle? focusTextStyle;
-
-  /// Alignment of the header content.
   final AlignmentGeometry? alignment;
-
-  /// Optional styling for navigation icons (left/right).
   final IconDecoration? iconDecoration;
-
-  /// Box decoration (e.g., background color, border) for the header container.
-  final BoxDecoration? headerDecoration;
-
-  /// Padding inside the header.
+  final BoxDecoration? boxDecoration;
   final EdgeInsetsGeometry? headerPadding;
-
-  /// Margin outside the header container.
   final EdgeInsetsGeometry? headerMargin;
 
-  const HeaderDecoration({
+  const HeaderTheme({
     this.alignment,
     this.headerMargin,
     this.headerPadding,
     this.iconDecoration,
     this.headerTextStyle,
     this.focusTextStyle,
-    this.headerDecoration,
+    this.boxDecoration,
   });
 
-  HeaderDecoration copyWith({
+  HeaderTheme copyWith({
     TextStyle? focusTextStyle,
     TextStyle? headerTextStyle,
     AlignmentGeometry? alignment,
     IconDecoration? iconDecoration,
-    BoxDecoration? headerDecoration,
+    BoxDecoration? boxDecoration,
     EdgeInsetsGeometry? headerMargin,
     EdgeInsetsGeometry? headerPadding,
   }) {
-    return HeaderDecoration(
+    return HeaderTheme(
       alignment: alignment ?? this.alignment,
       headerMargin: headerMargin ?? this.headerMargin,
       headerPadding: headerPadding ?? this.headerPadding,
       iconDecoration: iconDecoration ?? this.iconDecoration,
       focusTextStyle: focusTextStyle ?? this.focusTextStyle,
       headerTextStyle: headerTextStyle ?? this.headerTextStyle,
-      headerDecoration: headerDecoration ?? this.headerDecoration,
+      boxDecoration: boxDecoration ?? this.boxDecoration,
     );
   }
 }
 
 /// Defines configuration for navigation or decorative icons in the picker.
 class IconDecoration {
-  /// Icon for left navigation (e.g., previous month/year).
   final IconData? leftIcon;
-
-  /// Icon for right navigation (e.g., next month/year).
   final IconData? rightIcon;
-
-  /// Icon color on hover.
-  final Color? hoverColor;
-
-  /// Icon color on focus.
-  final Color? focusColor;
-
-  /// Icon color in default state (left icon).
   final Color? leftIconColor;
-
-  /// Icon size (left).
   final double? leftIconSize;
-
-  /// Icon color in default state (right icon).
   final Color? rightIconColor;
-
-  /// Icon size (right).
   final double? rightIconSize;
-
-  /// Icon color when left icon is focused.
   final Color? leftFocusIconColor;
-
-  /// Icon color when right icon is focused.
   final Color? rightFocusIconColor;
 
   const IconDecoration({
     this.leftIcon,
     this.rightIcon,
-    this.hoverColor,
-    this.focusColor,
     this.leftIconSize,
     this.leftIconColor,
     this.rightIconSize,
@@ -223,8 +167,6 @@ class IconDecoration {
   });
 
   IconDecoration copyWith({
-    Color? hoverColor,
-    Color? focusColor,
     IconData? leftIcon,
     IconData? rightIcon,
     double? leftIconSize,
@@ -237,8 +179,6 @@ class IconDecoration {
     return IconDecoration(
       leftIcon: leftIcon ?? this.leftIcon,
       rightIcon: rightIcon ?? this.rightIcon,
-      focusColor: focusColor ?? this.focusColor,
-      hoverColor: hoverColor ?? this.hoverColor,
       leftIconSize: leftIconSize ?? this.leftIconSize,
       leftIconColor: leftIconColor ?? this.leftIconColor,
       rightIconSize: rightIconSize ?? this.rightIconSize,
@@ -249,189 +189,79 @@ class IconDecoration {
   }
 }
 
-/// Defines styling for month tiles in the picker.
-class MonthDecoration {
-  /// Hover color for the cell.
-  final Color? hoverColor;
-
-  /// Focus color for the cell.
-  final Color? focusColor;
-
-  /// Text style when the cell is selected.
-  final TextStyle? selectedTextStyle;
-
-  /// Text style when the cell is not selected.
-  final TextStyle? unSelectedTextStyle;
-
-  /// Text style when the cell is disabled.
+/// A guide class that defines all available text styles and decorations
+/// for customizing the date picker (day, month, and year views).
+///
+/// Use this to provide consistent styling across focus, selection,
+/// and hover states.
+class PickerTheme {
+  /// Style for disabled cells (e.g., days outside allowed range).
   final TextStyle? disableTextStyle;
 
-  /// Box decoration when the cell is selected.
-  final BoxDecoration? selectedDecoration;
-
-  /// Box decoration when the cell is focused.
-  final BoxDecoration? focusDecoration;
-
-  /// Box decoration when the cell is not selected.
-  final BoxDecoration? unSelectedDecoration;
-
-  const MonthDecoration({
-    this.hoverColor,
-    this.focusColor,
-    this.disableTextStyle,
-    this.focusDecoration,
-    this.selectedTextStyle,
-    this.selectedDecoration,
-    this.unSelectedTextStyle,
-    this.unSelectedDecoration,
-  });
-
-  MonthDecoration copyWith({
-    double? height,
-    double? width,
-    Color? hoverColor,
-    Color? focusColor,
-    TextStyle? disableTextStyle,
-    TextStyle? selectedTextStyle,
-    BoxDecoration? focusDecoration,
-    TextStyle? unSelectedTextStyle,
-    BoxDecoration? selectedDecoration,
-    BoxDecoration? unSelectedDecoration,
-  }) {
-    return MonthDecoration(
-      hoverColor: hoverColor ?? this.hoverColor,
-      focusColor: focusColor ?? this.focusColor,
-      focusDecoration: focusDecoration ?? this.focusDecoration,
-      disableTextStyle: disableTextStyle ?? this.disableTextStyle,
-      selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
-      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
-      unSelectedTextStyle: unSelectedTextStyle ?? this.unSelectedTextStyle,
-      unSelectedDecoration: unSelectedDecoration ?? this.unSelectedDecoration,
-    );
-  }
-}
-
-/// Defines styling for year tiles in the picker.
-class YearDecoration {
-  /// Hover color for the cell.
-  final Color? hoverColor;
-
-  /// Focus color for the cell.
-  final Color? focusColor;
-
-  /// Text style when the cell is selected.
-  final TextStyle? selectedTextStyle;
-
-  /// Text style when the cell is not selected.
-  final TextStyle? unSelectedTextStyle;
-
-  /// Text style when the cell is disabled.
-  final TextStyle? disableTextStyle;
-
-  /// Box decoration when the cell is selected.
-  final BoxDecoration? selectedDecoration;
-
-  /// Box decoration when the cell is focused.
-  final BoxDecoration? focusDecoration;
-
-  /// Box decoration when the cell is not selected.
-  final BoxDecoration? unSelectedDecoration;
-
-  const YearDecoration({
-    this.hoverColor,
-    this.focusColor,
-    this.disableTextStyle,
-    this.focusDecoration,
-    this.selectedTextStyle,
-    this.selectedDecoration,
-    this.unSelectedTextStyle,
-    this.unSelectedDecoration,
-  });
-
-  YearDecoration copyWith({
-    double? height,
-    double? width,
-    Color? hoverColor,
-    Color? focusColor,
-    TextStyle? disableTextStyle,
-    TextStyle? selectedTextStyle,
-    BoxDecoration? focusDecoration,
-    TextStyle? unSelectedTextStyle,
-    BoxDecoration? selectedDecoration,
-    BoxDecoration? unSelectedDecoration,
-  }) {
-    return YearDecoration(
-      hoverColor: hoverColor ?? this.hoverColor,
-      focusColor: focusColor ?? this.focusColor,
-      focusDecoration: focusDecoration ?? this.focusDecoration,
-      disableTextStyle: disableTextStyle ?? this.disableTextStyle,
-      selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
-      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
-      unSelectedTextStyle: unSelectedTextStyle ?? this.unSelectedTextStyle,
-      unSelectedDecoration: unSelectedDecoration ?? this.unSelectedDecoration,
-    );
-  }
-}
-
-/// Defines styling for individual day tiles in the picker calendar.
-class DayDecoration {
-  /// Hover color for the cell.
-  final Color? hoverColor;
-
-  /// Text style for disabled (non-interactive) days.
-  final TextStyle? disableTextStyle;
-
-  /// Text style when the day is focused.
+  /// Style for the focused cell (e.g., hovered or keyboard-focused item).
   final TextStyle? focusTextStyle;
 
-  /// Text style for selected day.
+  /// Style for the selected cell (chosen day, month, or year).
   final TextStyle? selectedTextStyle;
 
-  /// Text style for unselected day.
+  /// Style for unselected but enabled cells (default text style).
   final TextStyle? unSelectedTextStyle;
 
-  /// Decoration for a focused day.
+  /// Decoration for the focused cell (border, background, etc.).
   final BoxDecoration? focusDecoration;
 
-  /// Decoration for a selected day.
+  /// Decoration for the selected cell (border, background, etc.).
   final BoxDecoration? selectedDecoration;
 
-  /// Decoration for an unselected day.
+  /// Decoration for unselected but enabled cells.
   final BoxDecoration? unSelectedDecoration;
 
-  const DayDecoration({
-    this.hoverColor,
-    this.focusTextStyle,
-    this.focusDecoration,
+  /// Hover effect radius for cells.
+  final double? hoverRadius;
+
+  /// Background color when a cell is hovered.
+  final Color? hoverColor;
+
+  /// Background color when a cell is focused.
+  final Color? focusColor;
+
+  const PickerTheme({
     this.disableTextStyle,
+    this.focusTextStyle,
     this.selectedTextStyle,
-    this.selectedDecoration,
     this.unSelectedTextStyle,
+    this.focusDecoration,
+    this.selectedDecoration,
     this.unSelectedDecoration,
+    this.hoverRadius,
+    this.hoverColor,
+    this.focusColor,
   });
 
-  DayDecoration copyWith({
-    double? height,
-    double? width,
-    Color? hoverColor,
-    Color? focusColor,
-    TextStyle? focusTextStyle,
+  /// Creates a new [PickerTheme] by overriding selected fields.
+  PickerTheme copyWith({
     TextStyle? disableTextStyle,
+    TextStyle? focusTextStyle,
     TextStyle? selectedTextStyle,
     TextStyle? unSelectedTextStyle,
     BoxDecoration? focusDecoration,
     BoxDecoration? selectedDecoration,
     BoxDecoration? unSelectedDecoration,
+    double? hoverRadius,
+    Color? hoverColor,
+    Color? focusColor,
   }) {
-    return DayDecoration(
-      hoverColor: hoverColor ?? this.hoverColor,
-      focusTextStyle: focusTextStyle ?? this.focusTextStyle,
-      focusDecoration: focusDecoration ?? this.focusDecoration,
+    return PickerTheme(
       disableTextStyle: disableTextStyle ?? this.disableTextStyle,
+      focusTextStyle: focusTextStyle ?? this.focusTextStyle,
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
-      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
       unSelectedTextStyle: unSelectedTextStyle ?? this.unSelectedTextStyle,
+      focusDecoration: focusDecoration ?? this.focusDecoration,
+      selectedDecoration: selectedDecoration ?? this.selectedDecoration,
       unSelectedDecoration: unSelectedDecoration ?? this.unSelectedDecoration,
+      hoverRadius: hoverRadius ?? this.hoverRadius,
+      hoverColor: hoverColor ?? this.hoverColor,
+      focusColor: focusColor ?? this.focusColor,
     );
   }
 }

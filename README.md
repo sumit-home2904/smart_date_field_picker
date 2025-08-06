@@ -80,19 +80,13 @@ The `_setupYearRange` function determines the start (`firstDate`) and end (`last
 
 ```dart
 SmartDateFieldPicker(
-  initialDate: selectedDate,
-  firstDate: DateTime(2020, 1, 1),
-  lastDate: DateTime(2030, 12, 31),
-  controller: controller,
-  decoration: const InputDecoration(
-    labelText: 'Pick a date',
-    border: OutlineInputBorder(),
-  ),
-  onDateSelected: (value) {
-    setState(() {
-      selectedDate = value ?? DateTime.now();
-    });
-  },
+initialDate: initDate,
+controller: controller,
+onDateSelected: (value) {
+setState(() {
+initDate = value ?? DateTime.now();
+});
+},
 ),
 ```
 
@@ -115,24 +109,38 @@ You can customize the appearance using the `PickerDecoration` and nested decorat
 
 ```dart
 PickerDecoration(
-  width: 300,
-  height: 350,
-  textStyle: TextStyle(color: Colors.black),
-  headerDecoration: HeaderDecoration(
-    headerTextStyle: TextStyle(color: Colors.white),
-    focusTextStyle: TextStyle(color: Colors.amber),
-    iconDecoration: IconDecoration(
-      leftIcon: Icons.arrow_back_ios,
-      rightIcon: Icons.arrow_forward_ios,
-    ),
-  ),
-  dayDecoration: DayDecoration(
-    selectedDecoration: BoxDecoration(
-      color: Colors.deepPurple,
-      borderRadius: BorderRadius.circular(6),
-    ),
-  ),
+width: 300,
+height: 350,
+textStyle: const TextStyle(color: Colors.black),
+
+// Header styling
+headerTheme: const HeaderTheme(
+headerTextStyle: TextStyle(color: Colors.white),
+focusTextStyle: TextStyle(color: Colors.amber),
+iconDecoration: IconDecoration(
+leftIcon: Icons.arrow_back_ios,
+rightIcon: Icons.arrow_forward_ios,
+),
+),
+
+// Unified styling for day, month, and year cells
+pickerTheme: PickerTheme(
+selectedDecoration: BoxDecoration(
+color: Colors.deepPurple,
+borderRadius: BorderRadius.circular(6),
+),
+selectedTextStyle: const TextStyle(
+color: Colors.white,
+fontWeight: FontWeight.bold,
+),
+unSelectedTextStyle: const TextStyle(color: Colors.black),
+focusDecoration: BoxDecoration(
+border: Border.all(color: Colors.deepPurple, width: 2),
+borderRadius: BorderRadius.circular(6),
+),
+),
 )
+
 ```
 
 ---

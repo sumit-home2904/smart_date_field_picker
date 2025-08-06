@@ -49,7 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
             SmartDateFieldPicker(
               initialDate: initDate,
               controller: controller,
-              decoration: InputDecoration(),
               onDateSelected: (value) {
                 setState(() {
                   initDate = value ?? DateTime.now();
