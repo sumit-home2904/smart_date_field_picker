@@ -1,7 +1,7 @@
 # smart_date_field_picker 📅
 
-A customizable and accessible date field picker widget for Flutter. `SmartDateFieldPicker` seamlessly 
-integrates with `TextFormField`, providing a rich calendar overlay with keyboard navigation, 
+A customizable and accessible date field picker widget for Flutter. `SmartDateFieldPicker` seamlessly
+integrates with `TextFormField`, providing a rich calendar overlay with keyboard navigation,
 focus handling, and support for dynamic date ranges and appearance customization.
 
 ---
@@ -61,32 +61,32 @@ It ensures the widget works even when `firstDate` or `lastDate` is not provided.
 The `_setupYearRange` function determines the start (`firstDate`) and end (`lastDate`) of the year range based on the following rules:
 
 1. **No `firstDate` and `lastDate` provided**
-    - Generates 12 years centered around `initialDate`.
-    - Range: 6 years before and 5 years after `initialDate`.
-    - Example: `initialDate = 2025` → Range: `2019 - 2030`.
+   - Generates 12 years centered around `initialDate`.
+   - Range: 6 years before and 5 years after `initialDate`.
+   - Example: `initialDate = 2025` → Range: `2019 - 2030`.
 
 2. **Only `firstDate` provided**
-    - Generates 12 years starting from `firstDate`.
-    - Example: `firstDate = 2020` → Range: `2020 - 2031`.
+   - Generates 12 years starting from `firstDate`.
+   - Example: `firstDate = 2020` → Range: `2020 - 2031`.
 
 3. **Only `lastDate` provided**
-    - Generates 12 years ending at `lastDate`.
-    - Example: `lastDate = 2030` → Range: `2019 - 2030`.
+   - Generates 12 years ending at `lastDate`.
+   - Example: `lastDate = 2030` → Range: `2019 - 2030`.
 
 4. **Both `firstDate` and `lastDate` provided**
-    - Uses the given range without modification.
+   - Uses the given range without modification.
 
 ---
 
 ```dart
 SmartDateFieldPicker(
-initialDate: initDate,
-controller: controller,
-onDateSelected: (value) {
-setState(() {
-initDate = value ?? DateTime.now();
-});
-},
+  initialDate: initDate,
+  controller: controller,
+  onDateSelected: (value) {
+    setState(() {
+    initDate = value ?? DateTime.now();
+  });
+  },
 ),
 ```
 
@@ -109,36 +109,34 @@ You can customize the appearance using the `PickerDecoration` and nested decorat
 
 ```dart
 PickerDecoration(
-width: 300,
-height: 350,
-textStyle: const TextStyle(color: Colors.black),
-
-// Header styling
-headerTheme: const HeaderTheme(
-headerTextStyle: TextStyle(color: Colors.white),
-focusTextStyle: TextStyle(color: Colors.amber),
-iconDecoration: IconDecoration(
-leftIcon: Icons.arrow_back_ios,
-rightIcon: Icons.arrow_forward_ios,
-),
-),
-
-// Unified styling for day, month, and year cells
-pickerTheme: PickerTheme(
-selectedDecoration: BoxDecoration(
-color: Colors.deepPurple,
-borderRadius: BorderRadius.circular(6),
-),
-selectedTextStyle: const TextStyle(
-color: Colors.white,
-fontWeight: FontWeight.bold,
-),
-unSelectedTextStyle: const TextStyle(color: Colors.black),
-focusDecoration: BoxDecoration(
-border: Border.all(color: Colors.deepPurple, width: 2),
-borderRadius: BorderRadius.circular(6),
-),
-),
+  width: 300,
+  height: 350,
+  textStyle: const TextStyle(color: Colors.black),
+  // Header styling
+  headerTheme: const HeaderTheme(
+    headerTextStyle: TextStyle(color: Colors.white),
+    focusTextStyle: TextStyle(color: Colors.amber),
+    iconDecoration: IconDecoration(
+      leftIcon: Icons.arrow_back_ios,
+      rightIcon: Icons.arrow_forward_ios,
+    ),
+  ),
+  // Unified styling for day, month, and year cells
+  pickerTheme: PickerTheme(
+   selectedDecoration: BoxDecoration(
+      color: Colors.deepPurple,
+      borderRadius: BorderRadius.circular(6),
+   ),
+  selectedTextStyle: const TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+  ),
+   unSelectedTextStyle: const TextStyle(color: Colors.black),
+   focusDecoration: BoxDecoration(
+      border: Border.all(color: Colors.deepPurple, width: 2),
+      borderRadius: BorderRadius.circular(6),
+    ),
+   ),
 )
 
 ```

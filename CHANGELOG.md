@@ -1,4 +1,4 @@
-## 0.0.3
+## 0.0.3+1
 - Initial value issue fixed or decoration property modified for UI and theme customization
 
 ## 0.0.2
