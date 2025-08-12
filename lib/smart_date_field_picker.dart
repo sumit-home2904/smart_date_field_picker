@@ -144,6 +144,22 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
   }
 
   @override
+  void didUpdateWidget(covariant SmartDateFieldPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.initialDate != null) {
+      textController.text =
+          DateFormat("dd/MM/yyyy").format(widget.initialDate!);
+    } else {
+      textController.clear();
+      widget.onDateSelected(null);
+    }
+
+    // setState(() {});
+    // _setupYearRange();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return OverlayPortal(
       controller: widget.controller,

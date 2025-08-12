@@ -1,3 +1,6 @@
+## 0.0.3+2
+- Initial value issue fixed.
+
 ## 0.0.3+1
 - Initial value issue fixed or decoration property modified for UI and theme customization
 

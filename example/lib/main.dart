@@ -34,7 +34,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DateTime initDate = DateTime.now();
+  DateTime? initDate = DateTime.now();
   final _form = GlobalKey<FormState>();
   final dropdownKey = GlobalKey<SmartDateFieldPickerState>();
   OverlayPortalController controller = OverlayPortalController();
