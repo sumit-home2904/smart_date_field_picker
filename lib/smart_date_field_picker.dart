@@ -148,13 +148,13 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.initialDate != oldWidget.initialDate) {
-      if(widget.initialDate != null ){
+      if (widget.initialDate != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          textController.text = DateFormat("dd/MM/yyyy").format(widget.initialDate!);
+          textController.text =
+              DateFormat("dd/MM/yyyy").format(widget.initialDate!);
           widget.onDateSelected(widget.initialDate!);
           setState(() {});
         });
-
       } else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           textController.clear();
@@ -163,7 +163,6 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
         });
       }
     }
-
   }
 
   @override
