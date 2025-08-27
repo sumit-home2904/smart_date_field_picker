@@ -952,7 +952,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             child: SizedBox(
               key: key2,
               height: widget.pickerDecoration?.height ?? 330,
-              width: widget.pickerDecoration?.width ?? 270,
+              width: widget.pickerDecoration?.width ??c.maxWidth,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

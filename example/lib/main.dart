@@ -47,6 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             SmartDateFieldPicker(
+              pickerDecoration: PickerDecoration(
+                width: 270
+              ),
               initialDate: initDate,
               controller: controller,
               onDateSelected: (value) {

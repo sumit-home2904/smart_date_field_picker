@@ -98,7 +98,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
   late FocusNode focusNode;
 
   /// Formatter to enforce a DD/MM/YYYY date format.
-  late final MaskTextInputFormatter maskFormatter;
+  late MaskTextInputFormatter maskFormatter;
 
   late DateTime firstDate;
   late DateTime lastDate;
@@ -153,6 +153,13 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
           textController.text =
               DateFormat("dd/MM/yyyy").format(widget.initialDate!);
           widget.onDateSelected(widget.initialDate!);
+
+          maskFormatter = MaskTextInputFormatter(
+              mask: '##/##/####',
+              filter: {"#": RegExp(r'[0-9]')},
+              type: MaskAutoCompletionType.lazy,
+              initialText: textController.text
+          );
           setState(() {});
         });
       } else {
@@ -232,6 +239,24 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
             onChanged: (value) => dropDownOpen(),
             onFieldSubmitted: (value) => widget.controller.hide(),
             style: widget.pickerDecoration?.textStyle,
+            onSaved: (newValue) {
+              maskFormatter = MaskTextInputFormatter(
+                  mask: '##/##/####',
+                  filter: {"#": RegExp(r'[0-9]')},
+                  type: MaskAutoCompletionType.lazy,
+                  initialText: textController.text
+              );
+              setState(() {});
+            },
+            onEditingComplete: () {
+              maskFormatter = MaskTextInputFormatter(
+                  mask: '##/##/####',
+                  filter: {"#": RegExp(r'[0-9]')},
+                  type: MaskAutoCompletionType.lazy,
+                  initialText: textController.text
+              );
+              setState(() {});
+            },
             autovalidateMode: widget.autoValidateMode,
             showCursor: widget.pickerDecoration?.showCursor,
             cursorHeight: widget.pickerDecoration?.cursorHeight,
@@ -256,7 +281,16 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
 
   /// Handles tap on the input field to show the date picker overlay.
   void textFiledOnTap() {
+
     if (!widget.readOnly) {
+      maskFormatter = MaskTextInputFormatter(
+          mask: '##/##/####',
+          filter: {"#": RegExp(r'[0-9]')},
+          type: MaskAutoCompletionType.lazy,
+          initialText: textController.text
+      );
+
+      setState(() {});
       widget.controller.show();
     }
   }
@@ -265,6 +299,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
   void dropDownOpen() {
     if (!widget.readOnly && !widget.controller.isShowing) {
       widget.controller.show();
+
     }
   }
 }
