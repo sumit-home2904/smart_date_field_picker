@@ -58,6 +58,21 @@ class OverlayBuilder extends StatefulWidget {
 }
 
 class _OverlayBuilderState extends State<OverlayBuilder> {
+
+  /// When true -> align overlay to the right of anchor (so overlay appears to the left of anchor)
+  bool displayOverlayLeft = false;
+
+  /// whether overlay should align to anchor's right edge (i.e. place overlay to left)
+  bool alignOverlayRightToAnchor = false;
+
+  // measured overlay width and anchor position/width
+  double? _measuredOverlayWidth;
+  double? _anchorX;
+  double? _anchorWidth;
+
+  // padding from screen edges
+  final double _screenPadding = 8.0;
+
   /// Controller for managing the text input in the date field.
   late TextEditingController _textController;
 
@@ -105,13 +120,34 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     super.initState();
 
     // Initialize display and selected dates.
-    _currentDisplayDate = widget.initialDate ?? DateTime.now();
-    selectedDate = widget.initialDate ?? DateTime.now();
-    focusSelectedDate = widget.initialDate ?? DateTime.now();
+    // _currentDisplayDate = widget.initialDate ?? DateTime.now();
+    // selectedDate = widget.initialDate ?? DateTime.now();
+    // focusSelectedDate = widget.initialDate ?? DateTime.now();
+
+    if (widget.initialDate != null) {
+      _currentDisplayDate = widget.initialDate!;
+      selectedDate = widget.initialDate!;
+      focusSelectedDate = widget.initialDate!;
+    } else {
+      // take only year & month from lastDate, and set to last day of that month
+      final year = widget.lastDate.year;
+      final month = widget.lastDate.month;
+      final lastDay = DateTime(year, month + 1, 0); // gives last day of month
+      _currentDisplayDate = lastDay;
+      selectedDate = lastDay;
+      focusSelectedDate = lastDay;
+    }
 
     // Assign external text controller and listen for changes.
     _textController = widget.textController;
     _textController.addListener(_onTextChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkRenderObjects();
+    });
+
+    final effectiveLastDate = _normalizeLastDate(widget.lastDate);
+
 
     // Rebuild when arrow buttons or header gains/loses focus.
     arrowLeftFocusNode.addListener(() {
@@ -206,41 +242,119 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   /// Checks whether the overlay should be displayed above or below the anchor
   /// based on available screen space and platform constraints.
+
   void checkRenderObjects() {
-    if (key1.currentContext != null && key2.currentContext != null) {
-      final RenderBox? render1 =
-          key1.currentContext?.findRenderObject() as RenderBox?;
-      final RenderBox? render2 =
-          key2.currentContext?.findRenderObject() as RenderBox?;
+    // Use provided anchor renderBox (from parent) if available, otherwise use key1
+    final RenderBox? renderAnchor =
+        widget.renderBox ?? (key1.currentContext?.findRenderObject() as RenderBox?);
+    final RenderBox? renderOverlay =
+    key2.currentContext?.findRenderObject() as RenderBox?;
 
-      if (render1 != null && render2 != null) {
-        final screenHeight = MediaQuery.of(context).size.height;
-        double y = render1.localToGlobal(Offset.zero).dy;
+    if (renderAnchor == null || renderOverlay == null) return;
 
-        if (Platform.isAndroid || Platform.isIOS) {
-          // If remaining height is less than required, display above.
-          if (screenHeight - y - (MediaQuery.of(context).size.height * 0.4) <
-              render2.size.height) {
-            displayOverlayBottom = false;
-          }
-        } else {
-          if (screenHeight - y < render2.size.height) {
-            displayOverlayBottom = false;
-          }
-        }
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
 
-        setState(() {}); // Update the state after calculation.
+    // anchor global pos & size
+    final anchorGlobal = renderAnchor.localToGlobal(Offset.zero);
+    final anchorX = anchorGlobal.dx;
+    final anchorY = anchorGlobal.dy;
+    final anchorW = renderAnchor.size.width;
+    final anchorH = renderAnchor.size.height;
+
+    // overlay measured width (prefer decoration width if set)
+    final overlayW = widget.pickerDecoration?.width ?? renderOverlay.size.width;
+
+    // save for use in setOffset
+    _measuredOverlayWidth = overlayW;
+    _anchorX = anchorX;
+    _anchorWidth = anchorW;
+
+    // Vertical: decide top or bottom as before (keep your existing logic)
+    double availableBelow = screenHeight - (anchorY + anchorH);
+    double availableAbove = anchorY;
+    if (Platform.isAndroid || Platform.isIOS) {
+      if (availableBelow < (screenHeight * 0.4) && availableAbove > availableBelow) {
+        displayOverlayBottom = false;
+      } else {
+        displayOverlayBottom = true;
+      }
+    } else {
+      if (availableBelow < renderOverlay.size.height && availableAbove > availableBelow) {
+        displayOverlayBottom = false;
+      } else {
+        displayOverlayBottom = true;
       }
     }
+
+    // Horizontal alignment logic you asked for:
+    // 1) Default: left-align overlay so overlay.left == anchor.left
+    // 2) If that would overflow right (anchorX + overlayW > screenWidth - padding)
+    //    -> align overlay RIGHT edge to anchor RIGHT edge (so overlay shifts left)
+    // 3) If left-aligned overlay would overflow left (anchorX < padding)
+    //    -> align overlay LEFT to anchor left (but shift right to padding if overlay would go beyond)
+    alignOverlayRightToAnchor = false; // default
+
+    // Case: overlay would overflow right when left-aligned
+    if (anchorX + overlayW + _screenPadding > screenWidth) {
+      // align overlay right edge with anchor right edge
+      alignOverlayRightToAnchor = true;
+    } else if (anchorX < _screenPadding) {
+      // anchor is very close to left edge; keep left-aligned but we'll shift overlay right slightly in setOffset
+      alignOverlayRightToAnchor = false;
+    } else {
+      // normal: left-aligned
+      alignOverlayRightToAnchor = false;
+    }
+
+    if (mounted) setState(() {});
+
+
   }
+
+
 
   /// Returns the offset for the overlay based on dropdownOffset and placement direction.
   Offset setOffset() {
-    return Offset(
-      widget.dropdownOffset?.dx ?? 05,
-      displayOverlayBottom ? widget.dropdownOffset?.dy ?? 55 : -10,
-    );
+    final defaultDx = widget.dropdownOffset?.dx ?? 0.0;
+    final defaultDy = widget.dropdownOffset?.dy ?? 55.0;
+    final dy = displayOverlayBottom ? defaultDy : -10.0;
+
+    // If we measured overlay and anchor, compute precise dx
+    if (_measuredOverlayWidth != null && _anchorX != null && _anchorWidth != null) {
+      final overlayW = _measuredOverlayWidth!;
+      final anchorX = _anchorX!;
+      final anchorW = _anchorWidth!;
+
+      // 1) If overlay should align its RIGHT edge to anchor's RIGHT edge:
+      //    overlay.right == anchor.right
+      //    offset dx relative to anchor.left = -(overlayW - anchorW)
+      if (alignOverlayRightToAnchor) {
+        double dx = defaultDx + -(overlayW - anchorW);
+        // ensure we still keep small padding from screen edge
+        if (anchorX + dx < _screenPadding - 1) {
+          // If this would push overlay beyond left edge, clamp to padding
+          dx = _screenPadding - anchorX;
+        }
+        return Offset(dx, dy);
+      }
+
+      // 2) If overlay left-aligned would overflow left (anchorX < padding),
+      //    shift overlay right so its left == padding
+      if (anchorX + defaultDx < _screenPadding) {
+        double shiftRight = _screenPadding - (anchorX + defaultDx);
+        return Offset(defaultDx + shiftRight, dy);
+      }
+
+      // 3) Normal left-aligned case: overlay.left == anchor.left (plus any dropdownOffset.dx)
+      return Offset(defaultDx, dy);
+    }
+
+    // Fallback before we measure: return a reasonable default
+    return Offset(defaultDx != 0.0 ? defaultDx : 5.0, dy);
   }
+
 
   /// Builds the calendar/month picker header UI, including navigation arrows and month-year display.
   Widget _buildHeader() {
@@ -364,7 +478,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   /// Checks if user can navigate to the previous month based on `firstDate` constraint.
-  bool _canNavigateToPreviousMonth() {
+ /* bool _canNavigateToPreviousMonth() {
     DateTime firstOfMonth = DateTime(
       _currentDisplayDate.year,
       _currentDisplayDate.month,
@@ -379,7 +493,25 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     return !firstOfPreviousMonth.isBefore(
       DateTime(widget.firstDate.year, widget.firstDate.month, 1),
     );
+  }*/
+
+
+  bool _canNavigateToPreviousMonth() {
+    final firstOfPreviousMonth = DateTime(
+      _currentDisplayDate.year,
+      _currentDisplayDate.month - 1,
+      1,
+    );
+
+    final DateTime firstAllowedDay = DateTime(
+      widget.firstDate.year,
+      widget.firstDate.month,
+      1,
+    );
+
+    return !firstOfPreviousMonth.isBefore(firstAllowedDay);
   }
+
 
   /// Navigates to the previous month and updates current and focused display dates.
   void _previousMonth() {
@@ -400,7 +532,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   /// Checks if user can navigate to the next month based on `lastDate` constraint.
-  bool _canNavigateToNextMonth() {
+/*  bool _canNavigateToNextMonth() {
     DateTime firstOfMonth = DateTime(
       _currentDisplayDate.year,
       _currentDisplayDate.month,
@@ -412,10 +544,50 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       1,
     );
 
+    print("object1 ${!firstOfNextMonth.isAfter(DateTime(widget.lastDate.year, widget.lastDate.month, 1))}");
     return !firstOfNextMonth.isAfter(
       DateTime(widget.lastDate.year, widget.lastDate.month, 1),
     );
+  }*/
+
+
+  DateTime _normalizeLastDate(DateTime d) {
+    // if caller only set year and left month/day as 1 (common when writing DateTime(2025)),
+    // treat that as full year unless they explicitly passed month/day.
+    if (d.month == 1 && d.day == 1 && d.hour == 0 && d.minute == 0 && d.second == 0) {
+      return DateTime(d.year, 12, 31);
+    }
+    return d;
   }
+
+
+
+
+  /// Checks if user can navigate to the next month based on `lastDate` constraint.
+  /// This compares the first day of the next month vs the LAST day of widget.lastDate's month.
+  bool _canNavigateToNextMonth() {
+    // First day of the next month relative to current display.
+    final DateTime firstOfNextMonth = DateTime(
+      _currentDisplayDate.year,
+      _currentDisplayDate.month + 1,
+      1,
+    );
+
+    // Last allowed day for the month of widget.lastDate.
+    // DateTime(year, month + 1, 0) gives last day of (year, month).
+
+    print("widget.lastDate.month ${widget.lastDate.month}");
+    final DateTime lastAllowedDay = DateTime(
+      widget.lastDate.year,
+      widget.lastDate.month + 1,
+      0,
+    );
+
+    // Allow navigation if the first day of next month is NOT after the last allowed day.
+    return !firstOfNextMonth.isAfter(lastAllowedDay);
+  }
+
+
 
   /// Navigates to the next month and updates current and focused display dates.
   void _nextMonth() {
@@ -571,8 +743,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
         LogicalKeySet(LogicalKeyboardKey.enter): () {
           if (arrowLeftFocusNode.hasFocus && _canNavigateToPreviousMonth()) {
             _previousMonth();
-          } else if (arrowRightFocusNode.hasFocus &&
-              _canNavigateToNextMonth()) {
+          } else if (arrowRightFocusNode.hasFocus && _canNavigateToNextMonth()) {
             _nextMonth();
           } else if (dateFocusNode.hasFocus) {
             widget.controller.hide();
@@ -930,8 +1101,9 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     return CompositedTransformFollower(
       link: widget.layerLink,
       offset: setOffset(),
-      followerAnchor:
-          displayOverlayBottom ? Alignment.topLeft : Alignment.bottomLeft,
+      followerAnchor: displayOverlayBottom
+          ? (displayOverlayLeft ? Alignment.topRight : Alignment.topLeft)
+          : (displayOverlayLeft ? Alignment.bottomRight : Alignment.bottomLeft),
       child: LayoutBuilder(
         builder: (context, c) {
           return Container(
@@ -952,7 +1124,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
             child: SizedBox(
               key: key2,
               height: widget.pickerDecoration?.height ?? 330,
-              width: widget.pickerDecoration?.width ??c.maxWidth,
+              width: widget.pickerDecoration?.width ?? 270,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -962,6 +1134,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                     Expanded(
                       child: MyMonthPicker(
                         pickerDecoration: widget.pickerDecoration,
+                        lastDate: widget.lastDate,
                         width: widget.pickerDecoration?.width ?? 270,
                         height: widget.pickerDecoration?.height ?? 320,
                         currentDisplayDate: focusSelectedDate,

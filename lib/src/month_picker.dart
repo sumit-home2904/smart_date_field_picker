@@ -8,6 +8,7 @@ import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 class MyMonthPicker extends StatefulWidget {
   /// The date currently being displayed.
   final DateTime currentDisplayDate;
+  final DateTime lastDate;
 
   /// Callback to switch to the year picker.
   final Function() changeToYearPicker;
@@ -26,6 +27,7 @@ class MyMonthPicker extends StatefulWidget {
 
   const MyMonthPicker({
     required this.width,
+    required this.lastDate,
     required this.height,
     this.pickerDecoration,
     required this.onDateChanged,
@@ -87,26 +89,27 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
 
   /// Moves keyboard focus to the given [newIndex] of month.
   void moveFocus(int newIndex) {
-    if (newIndex >= 0 && newIndex < 12) {
-      setState(() {
-        focusMonthIndex = newIndex;
-        monthFocusNodes[focusMonthIndex].requestFocus();
-      });
-    } else {
-      // Loop focus from end to start or start to end
-      if (newIndex == 12) {
-        setState(() {
-          focusMonthIndex = 0;
-          monthFocusNodes[focusMonthIndex].requestFocus();
-        });
-      }
-      if (newIndex == -1) {
-        setState(() {
-          focusMonthIndex = 11;
-          monthFocusNodes[focusMonthIndex].requestFocus();
-        });
-      }
-    }
+
+     if (newIndex >= 0 && newIndex < 12) {
+       setState(() {
+         focusMonthIndex = newIndex;
+         monthFocusNodes[focusMonthIndex].requestFocus();
+       });
+     } else {
+       // Loop focus from end to start or start to end
+       if (newIndex == 12) {
+         setState(() {
+           focusMonthIndex = 0;
+           monthFocusNodes[focusMonthIndex].requestFocus();
+         });
+       }
+       if (newIndex == -1) {
+         setState(() {
+           focusMonthIndex = 11;
+           monthFocusNodes[focusMonthIndex].requestFocus();
+         });
+       }
+     }
   }
 
   int _getValidDay(int year, int month, int originalDay) {

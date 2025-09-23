@@ -162,7 +162,8 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
           );
           setState(() {});
         });
-      } else {
+      }
+      else {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           textController.clear();
           widget.onDateSelected(null);
@@ -233,11 +234,15 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
             controller: textController,
             validator: widget.validator,
             focusNode: widget.focusNode,
+
             onTap: () => textFiledOnTap(),
             inputFormatters: [maskFormatter],
             keyboardType: TextInputType.number,
             onChanged: (value) => dropDownOpen(),
-            onFieldSubmitted: (value) => widget.controller.hide(),
+            onFieldSubmitted: (value) {
+              widget.controller.hide();
+
+            },
             style: widget.pickerDecoration?.textStyle,
             onSaved: (newValue) {
               maskFormatter = MaskTextInputFormatter(

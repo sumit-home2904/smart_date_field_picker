@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
           seedColor: Colors.deepPurple,
           primary: Colors.deepPurple,
         ),
-        appBarTheme: const AppBarTheme(color: Colors.deepPurple),
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -34,10 +34,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DateTime? initDate = DateTime.now();
+  DateTime? initDate;
+  DateTime? initDate1;
   final _form = GlobalKey<FormState>();
-  final dropdownKey = GlobalKey<SmartDateFieldPickerState>();
   OverlayPortalController controller = OverlayPortalController();
+  OverlayPortalController controller1 = OverlayPortalController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,17 +47,41 @@ class _MyHomePageState extends State<MyHomePage> {
         key: _form,
         child: Column(
           children: [
-            SmartDateFieldPicker(
-              pickerDecoration: PickerDecoration(
-                width: 270
-              ),
-              initialDate: initDate,
-              controller: controller,
-              onDateSelected: (value) {
-                setState(() {
-                  initDate = value ?? DateTime.now();
-                });
-              },
+            Row(
+              children: [
+                Expanded(
+                  child: SmartDateFieldPicker(
+                    pickerDecoration: PickerDecoration(
+                      width: 270
+                    ),
+                    initialDate: initDate,
+                    controller: controller,
+                    onDateSelected: (value) {
+                      setState(() {
+                        initDate = value ?? DateTime.now();
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(width: 20),
+
+                Expanded(
+                  child: SmartDateFieldPicker(
+                    firstDate:DateTime(1900),
+                    lastDate: DateTime(2025,3,20),
+                    pickerDecoration: PickerDecoration(
+                        width: 270
+                    ),
+                    initialDate: initDate1,
+                    controller: controller1,
+                    onDateSelected: (value) {
+                      setState(() {
+                        initDate1 = value ?? DateTime.now();
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         ),
