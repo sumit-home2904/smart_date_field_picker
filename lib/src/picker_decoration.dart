@@ -262,7 +262,8 @@ class PickerTheme {
   }) {
     return PickerTheme(
       disableTextStyle: disableTextStyle ?? this.disableTextStyle,
-      currentMonthDecoration: currentMonthDecoration ?? this.currentMonthDecoration,
+      currentMonthDecoration:
+          currentMonthDecoration ?? this.currentMonthDecoration,
       currentMothTextStyle: currentMothTextStyle ?? this.currentMothTextStyle,
       focusTextStyle: focusTextStyle ?? this.focusTextStyle,
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,

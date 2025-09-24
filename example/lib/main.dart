@@ -35,10 +35,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DateTime? initDate;
-  DateTime? initDate1;
   final _form = GlobalKey<FormState>();
   OverlayPortalController controller = OverlayPortalController();
-  OverlayPortalController controller1 = OverlayPortalController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,41 +45,17 @@ class _MyHomePageState extends State<MyHomePage> {
         key: _form,
         child: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: SmartDateFieldPicker(
-                    pickerDecoration: PickerDecoration(
-                      width: 270
-                    ),
-                    initialDate: initDate,
-                    controller: controller,
-                    onDateSelected: (value) {
-                      setState(() {
-                        initDate = value ?? DateTime.now();
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 20),
-
-                Expanded(
-                  child: SmartDateFieldPicker(
-                    firstDate:DateTime(1900,1,31),
-                    lastDate: DateTime(2025,1,12),
-                    pickerDecoration: PickerDecoration(
-                        width: 270,
-                    ),
-                    initialDate: initDate1,
-                    controller: controller1,
-                    onDateSelected: (value) {
-                      setState(() {
-                        initDate1 = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
+            Expanded(
+              child: SmartDateFieldPicker(
+                pickerDecoration: PickerDecoration(width: 270),
+                initialDate: initDate,
+                controller: controller,
+                onDateSelected: (value) {
+                  setState(() {
+                    initDate = value ?? DateTime.now();
+                  });
+                },
+              ),
             ),
           ],
         ),

@@ -64,7 +64,6 @@ class OverlayBuilder extends StatefulWidget {
 }
 
 class _OverlayBuilderState extends State<OverlayBuilder> {
-
   /// When true -> align overlay to the right of anchor (so overlay appears to the left of anchor)
   bool displayOverlayLeft = false;
 
@@ -134,7 +133,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       final year = widget.lastDate.year;
       final month = widget.lastDate.month;
       final day = widget.lastDate.day;
-      final lastDay = DateTime(year, month,day); // gives last day of month
+      final lastDay = DateTime(year, month, day); // gives last day of month
       _currentDisplayDate = lastDay;
       selectedDate = lastDay;
       focusSelectedDate = lastDay;
@@ -147,8 +146,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkRenderObjects();
     });
-
-
 
     // Rebuild when arrow buttons or header gains/loses focus.
     arrowLeftFocusNode.addListener(() {
@@ -246,10 +243,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   void checkRenderObjects() {
     // Use provided anchor renderBox (from parent) if available, otherwise use key1
-    final RenderBox? renderAnchor =
-        widget.renderBox ?? (key1.currentContext?.findRenderObject() as RenderBox?);
+    final RenderBox? renderAnchor = widget.renderBox ??
+        (key1.currentContext?.findRenderObject() as RenderBox?);
     final RenderBox? renderOverlay =
-    key2.currentContext?.findRenderObject() as RenderBox?;
+        key2.currentContext?.findRenderObject() as RenderBox?;
 
     if (renderAnchor == null || renderOverlay == null) return;
 
@@ -276,13 +273,15 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     double availableBelow = screenHeight - (anchorY + anchorH);
     double availableAbove = anchorY;
     if (Platform.isAndroid || Platform.isIOS) {
-      if (availableBelow < (screenHeight * 0.4) && availableAbove > availableBelow) {
+      if (availableBelow < (screenHeight * 0.4) &&
+          availableAbove > availableBelow) {
         displayOverlayBottom = false;
       } else {
         displayOverlayBottom = true;
       }
     } else {
-      if (availableBelow < renderOverlay.size.height && availableAbove > availableBelow) {
+      if (availableBelow < renderOverlay.size.height &&
+          availableAbove > availableBelow) {
         displayOverlayBottom = false;
       } else {
         displayOverlayBottom = true;
@@ -310,11 +309,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     }
 
     if (mounted) setState(() {});
-
-
   }
-
-
 
   /// Returns the offset for the overlay based on dropdownOffset and placement direction.
   Offset setOffset() {
@@ -323,7 +318,9 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     final dy = displayOverlayBottom ? defaultDy : -10.0;
 
     // If we measured overlay and anchor, compute precise dx
-    if (_measuredOverlayWidth != null && _anchorX != null && _anchorWidth != null) {
+    if (_measuredOverlayWidth != null &&
+        _anchorX != null &&
+        _anchorWidth != null) {
       final overlayW = _measuredOverlayWidth!;
       final anchorX = _anchorX!;
       final anchorW = _anchorWidth!;
@@ -355,7 +352,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     // Fallback before we measure: return a reasonable default
     return Offset(defaultDx != 0.0 ? defaultDx : 5.0, dy);
   }
-
 
   /// Builds the calendar/month picker header UI, including navigation arrows and month-year display.
   Widget _buildHeader() {
@@ -479,7 +475,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   /// Checks if user can navigate to the previous month based on `firstDate` constraint.
- /* bool _canNavigateToPreviousMonth() {
+  /* bool _canNavigateToPreviousMonth() {
     DateTime firstOfMonth = DateTime(
       _currentDisplayDate.year,
       _currentDisplayDate.month,
@@ -496,7 +492,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     );
   }*/
 
-
   bool _canNavigateToPreviousMonth() {
     final firstOfPreviousMonth = DateTime(
       _currentDisplayDate.year,
@@ -512,7 +507,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
     return !firstOfPreviousMonth.isBefore(firstAllowedDay);
   }
-
 
   /// Navigates to the previous month and updates current and focused display dates.
   void _previousMonth() {
@@ -532,7 +526,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     }
   }
 
-
 /*
   DateTime _normalizeLastDate(DateTime d) {
     // if caller only set year and left month/day as 1 (common when writing DateTime(2025)),
@@ -543,9 +536,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     return d;
   }
 */
-
-
-
 
   /// Checks if user can navigate to the next month based on `lastDate` constraint.
   /// This compares the first day of the next month vs the LAST day of widget.lastDate's month.
@@ -569,8 +559,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     // Allow navigation if the first day of next month is NOT after the last allowed day.
     return !firstOfNextMonth.isAfter(lastAllowedDay);
   }
-
-
 
   /// Navigates to the next month and updates current and focused display dates.
   void _nextMonth() {
@@ -726,7 +714,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
         LogicalKeySet(LogicalKeyboardKey.enter): () {
           if (arrowLeftFocusNode.hasFocus && _canNavigateToPreviousMonth()) {
             _previousMonth();
-          } else if (arrowRightFocusNode.hasFocus && _canNavigateToNextMonth()) {
+          } else if (arrowRightFocusNode.hasFocus &&
+              _canNavigateToNextMonth()) {
             _nextMonth();
           } else if (dateFocusNode.hasFocus) {
             widget.controller.hide();
@@ -885,7 +874,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                     date.day == selectedDate.day;
 
                 // NEW: consider date disabled if outside allowed range
-                final bool isDisabled = date.isBefore(widget.firstDate) || date.isAfter(widget.lastDate);
+                final bool isDisabled = date.isBefore(widget.firstDate) ||
+                    date.isAfter(widget.lastDate);
 
                 // Focus logic: only show focus if this date is the focused date AND it's not disabled
                 final isFocusDate = !isDisabled &&
@@ -897,14 +887,15 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                 return Material(
                   color: Colors.transparent,
                   child: Focus(
-                    focusNode: isDisabled ? AlwaysDisabledFocusNode() : dateFocusNode,
+                    focusNode:
+                        isDisabled ? AlwaysDisabledFocusNode() : dateFocusNode,
                     child: InkWell(
                       focusColor:
-                      widget.pickerDecoration?.pickerTheme?.focusColor ??
-                          Colors.white,
+                          widget.pickerDecoration?.pickerTheme?.focusColor ??
+                              Colors.white,
                       hoverColor:
-                      widget.pickerDecoration?.pickerTheme?.hoverColor ??
-                          Colors.white12,
+                          widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                              Colors.white12,
                       borderRadius: BorderRadius.circular(
                           widget.pickerDecoration?.pickerTheme?.hoverRadius ??
                               defaultRadius),
@@ -912,11 +903,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                       onTap: isDisabled
                           ? null
                           : () {
-                        setState(() {
-                          focusSelectedDate = date;
-                        });
-                        _selectDate(date);
-                      },
+                              setState(() {
+                                focusSelectedDate = date;
+                              });
+                              _selectDate(date);
+                            },
                       child: Container(
                         margin: const EdgeInsets.all(4),
                         decoration: dayDecoration(
@@ -1006,11 +997,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   // }
 
   BoxDecoration dayDecoration(
-      bool isCurrentMonth,
-      bool isFocusDate,
-      bool isSelected,
-      bool isDisabled,
-      ) {
+    bool isCurrentMonth,
+    bool isFocusDate,
+    bool isSelected,
+    bool isDisabled,
+  ) {
     // Disabled state highest priority for decoration
     if (isDisabled) {
       return widget.pickerDecoration?.pickerTheme?.disableDecoration ??
@@ -1054,16 +1045,12 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
         );
   }
 
-
-
   TextStyle dayTextStyle(
-      bool isCurrentMonth,
-      bool isFocusDate,
-      bool isSelected,
-      bool isDisabled,
-      ) {
-
-
+    bool isCurrentMonth,
+    bool isFocusDate,
+    bool isSelected,
+    bool isDisabled,
+  ) {
     // Disabled highest priority
     if (isDisabled) {
       return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
@@ -1092,7 +1079,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     return widget.pickerDecoration?.pickerTheme?.currentMothTextStyle ??
         TextStyle(color: Colors.black);
   }
-
 
   /// Builds headers for weekdays (Mon, Tue, etc.) aligned with the calendar grid.
   Widget _buildWeekdayHeaders() {

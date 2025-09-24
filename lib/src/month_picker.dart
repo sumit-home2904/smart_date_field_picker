@@ -41,7 +41,7 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
 
     monthsList = List.generate(
       12,
-          (i) => DateTime(widget.currentDisplayDate.year, i + 1, 1),
+      (i) => DateTime(widget.currentDisplayDate.year, i + 1, 1),
     );
 
     monthFocusNodes = List.generate(12, (_) => FocusNode());
@@ -76,8 +76,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     super.dispose();
   }
 
-
-
   /// Check if a month should be disabled.
   /// Rules:
   /// 1) Allow months only up to currentDisplayDate.month (1..month)
@@ -88,17 +86,16 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     final year = monthDate.year;
 
     // Rule 1: month must be <= currentDisplayDate.month
-    if (monthNum  > widget.lastDate.month) return true;
-
+    if (monthNum > widget.lastDate.month) return true;
 
     // Rule 2: if month-year is after lastDate's month-year -> disabled
     if (year > widget.lastDate.year) return true;
 
-    if (year == widget.lastDate.year && monthNum > widget.lastDate.month) return true;
+    if (year == widget.lastDate.year && monthNum > widget.lastDate.month)
+      return true;
 
     return false;
   }
-
 
   bool _isMonthEnabled(int index) {
     if (index < 0 || index >= monthsList.length) return false;
@@ -117,7 +114,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     }
     return null;
   }
-
 
   /// Move focus; skip disabled months. direction can be positive/negative.
   void moveFocus(int newIndex) {
@@ -164,7 +160,9 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
       return;
     }
 
-    if (focusMonthIndex >= 0 && focusMonthIndex < 12 && _isMonthEnabled(focusMonthIndex)) {
+    if (focusMonthIndex >= 0 &&
+        focusMonthIndex < 12 &&
+        _isMonthEnabled(focusMonthIndex)) {
       final monthDate = monthsList[focusMonthIndex];
       final selectedMonth = monthDate.month;
       final selectedYear = monthDate.year;
@@ -195,22 +193,27 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
             final nearest = _nearestEnabledIndex(idx);
             if (nearest != null) {
               focusMonthIndex = nearest;
-              FocusScope.of(context).requestFocus(monthFocusNodes[focusMonthIndex]);
+              FocusScope.of(context)
+                  .requestFocus(monthFocusNodes[focusMonthIndex]);
             }
           } else {
             monthYearFocusNode.requestFocus();
           }
         },
-        LogicalKeySet(LogicalKeyboardKey.arrowRight): () => moveFocus(focusMonthIndex + 1),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft): () => moveFocus(focusMonthIndex - 1),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp): () => moveFocus(focusMonthIndex - 3),
+        LogicalKeySet(LogicalKeyboardKey.arrowRight): () =>
+            moveFocus(focusMonthIndex + 1),
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft): () =>
+            moveFocus(focusMonthIndex - 1),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp): () =>
+            moveFocus(focusMonthIndex - 3),
         LogicalKeySet(LogicalKeyboardKey.arrowDown): () {
           if (monthYearFocusNode.hasFocus) {
             final idx = (widget.currentDisplayDate.month - 1).clamp(0, 11);
             final nearest = _nearestEnabledIndex(idx);
             if (nearest != null) {
               focusMonthIndex = nearest;
-              FocusScope.of(context).requestFocus(monthFocusNodes[focusMonthIndex]);
+              FocusScope.of(context)
+                  .requestFocus(monthFocusNodes[focusMonthIndex]);
             }
           } else {
             moveFocus(focusMonthIndex + 3);
@@ -231,28 +234,38 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
             children: [
               Container(
                 width: widget.width,
-                alignment: widget.pickerDecoration?.headerTheme?.alignment ?? Alignment.center,
-                margin: widget.pickerDecoration?.headerTheme?.headerMargin ?? EdgeInsets.zero,
-                padding: widget.pickerDecoration?.headerTheme?.headerPadding ?? EdgeInsets.all(10),
-                decoration: widget.pickerDecoration?.headerTheme?.boxDecoration ??
-                    BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8),
-                      ),
-                    ),
+                alignment: widget.pickerDecoration?.headerTheme?.alignment ??
+                    Alignment.center,
+                margin: widget.pickerDecoration?.headerTheme?.headerMargin ??
+                    EdgeInsets.zero,
+                padding: widget.pickerDecoration?.headerTheme?.headerPadding ??
+                    EdgeInsets.all(10),
+                decoration:
+                    widget.pickerDecoration?.headerTheme?.boxDecoration ??
+                        BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8),
+                          ),
+                        ),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
                     focusNode: monthYearFocusNode,
-                    focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ?? Colors.white,
-                    hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ?? Colors.white12,
+                    focusColor:
+                        widget.pickerDecoration?.pickerTheme?.focusColor ??
+                            Colors.white,
+                    hoverColor:
+                        widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                            Colors.white12,
                     borderRadius: BorderRadius.circular(
-                        widget.pickerDecoration?.pickerTheme?.hoverRadius ?? defaultRadius),
+                        widget.pickerDecoration?.pickerTheme?.hoverRadius ??
+                            defaultRadius),
                     onTap: () => widget.changeToYearPicker(),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5.0, vertical: 6),
                       child: Text(
                         "Jan - Dec ${widget.currentDisplayDate.year}",
                         style: headerStyle(),
@@ -274,7 +287,8 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                   itemCount: 12,
                   itemBuilder: (context, index) {
                     final monthDate = monthsList[index];
-                    final isSelected = index == widget.currentDisplayDate.month - 1;
+                    final isSelected =
+                        index == widget.currentDisplayDate.month - 1;
                     final isFocused = index == focusMonthIndex;
                     final disabled = _isDisabledMonth(monthDate);
 
@@ -288,30 +302,35 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                         onTap: disabled
                             ? null
                             : () {
-                          final selectedMonth = monthDate.month;
-                          final selectedYear = monthDate.year;
-                          final adjustedDay = _getValidDay(
-                            selectedYear,
-                            selectedMonth,
-                            widget.currentDisplayDate.day,
-                          );
-                          widget.onDateChanged(
-                            DateTime(selectedYear, selectedMonth, adjustedDay),
-                          );
-                        },
+                                final selectedMonth = monthDate.month;
+                                final selectedYear = monthDate.year;
+                                final adjustedDay = _getValidDay(
+                                  selectedYear,
+                                  selectedMonth,
+                                  widget.currentDisplayDate.day,
+                                );
+                                widget.onDateChanged(
+                                  DateTime(
+                                      selectedYear, selectedMonth, adjustedDay),
+                                );
+                              },
                         borderRadius: BorderRadius.circular(
-                            widget.pickerDecoration?.pickerTheme?.hoverRadius ?? defaultRadius),
-                        hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ??
-                            Colors.transparent,
-                        focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ??
-                            Colors.transparent,
+                            widget.pickerDecoration?.pickerTheme?.hoverRadius ??
+                                defaultRadius),
+                        hoverColor:
+                            widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                                Colors.transparent,
+                        focusColor:
+                            widget.pickerDecoration?.pickerTheme?.focusColor ??
+                                Colors.transparent,
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: disabled
                               ? decoration.copyWith(
-                            color: Colors.grey.withValues(alpha: 0.06),
-                            border: Border.all(color: Colors.grey.shade300),
-                          )
+                                  color: Colors.grey.withValues(alpha: 0.06),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                )
                               : decoration,
                           alignment: Alignment.center,
                           child: Semantics(
@@ -320,7 +339,9 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                             selected: isSelected,
                             child: Text(
                               DateFormat.MMM().format(monthDate),
-                              style: disabled ? textStyle.copyWith(color: Colors.grey) : textStyle,
+                              style: disabled
+                                  ? textStyle.copyWith(color: Colors.grey)
+                                  : textStyle,
                             ),
                           ),
                         ),

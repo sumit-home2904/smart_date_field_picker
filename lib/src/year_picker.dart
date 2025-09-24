@@ -439,8 +439,6 @@ class MyYearPickerState extends State<MyYearPicker> {
 }
 */
 
-
-
 /*
 // lib/src/year_picker.dart
 import 'package:flutter/material.dart';
@@ -1206,7 +1204,6 @@ class MyYearPickerState extends State<MyYearPicker> {
   }
 }*/
 
-
 // lib/src/year_picker.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1271,19 +1268,17 @@ class MyYearPickerState extends State<MyYearPicker> {
   void _generateYearsAndNodes() {
     yearList = List.generate(
       widget.lastDate.year - widget.firstDate.year + 1,
-          (i) => widget.firstDate.year + i,
+      (i) => widget.firstDate.year + i,
     );
 
     // Dispose old nodes if present
     try {
-      if (yearFocusNodes != null) {
-        for (final n in yearFocusNodes) {
-          // Remove any listeners to avoid multiple calls (defensive)
-          try {
-            n.removeListener(_focusListener);
-          } catch (_) {}
-          n.dispose();
-        }
+      for (final n in yearFocusNodes) {
+        // Remove any listeners to avoid multiple calls (defensive)
+        try {
+          n.removeListener(_focusListener);
+        } catch (_) {}
+        n.dispose();
       }
     } catch (_) {}
 
@@ -1371,7 +1366,9 @@ class MyYearPickerState extends State<MyYearPicker> {
     final rowsAbove = (index / 3).floor();
     final targetOffset = (rowsAbove * (itemHeight + 6)).clamp(
       0.0,
-      scrollController.hasClients ? scrollController.position.maxScrollExtent : double.infinity,
+      scrollController.hasClients
+          ? scrollController.position.maxScrollExtent
+          : double.infinity,
     );
     if (scrollController.hasClients) {
       scrollController.animateTo(
@@ -1508,7 +1505,8 @@ class MyYearPickerState extends State<MyYearPicker> {
         LogicalKeySet(LogicalKeyboardKey.tab): () {
           if (!yearFocusNodes.any((n) => n.hasFocus)) {
             final idx = yearList.indexOf(widget.currentDisplayDate.year);
-            final fallback = (idx >= 0 && idx < yearFocusNodes.length) ? idx : 0;
+            final fallback =
+                (idx >= 0 && idx < yearFocusNodes.length) ? idx : 0;
             focusedIndex = fallback;
             yearFocusNodes[focusedIndex].requestFocus();
             _scrollToIndex(focusedIndex);
@@ -1519,7 +1517,8 @@ class MyYearPickerState extends State<MyYearPicker> {
         LogicalKeySet(LogicalKeyboardKey.shift, LogicalKeyboardKey.tab): () {
           if (!yearFocusNodes.any((n) => n.hasFocus)) {
             final idx = yearList.indexOf(widget.currentDisplayDate.year);
-            final fallback = (idx >= 0 && idx < yearFocusNodes.length) ? idx : 0;
+            final fallback =
+                (idx >= 0 && idx < yearFocusNodes.length) ? idx : 0;
             focusedIndex = fallback;
             yearFocusNodes[focusedIndex].requestFocus();
             _scrollToIndex(focusedIndex);
@@ -1536,10 +1535,10 @@ class MyYearPickerState extends State<MyYearPicker> {
             // Header
             Container(
               width: widget.width,
-              alignment:
-              widget.pickerDecoration?.headerTheme?.alignment ?? Alignment.center,
-              margin:
-              widget.pickerDecoration?.headerTheme?.headerMargin ?? EdgeInsets.zero,
+              alignment: widget.pickerDecoration?.headerTheme?.alignment ??
+                  Alignment.center,
+              margin: widget.pickerDecoration?.headerTheme?.headerMargin ??
+                  EdgeInsets.zero,
               padding: widget.pickerDecoration?.headerTheme?.headerPadding ??
                   const EdgeInsets.all(10),
               decoration: widget.pickerDecoration?.headerTheme?.boxDecoration ??
@@ -1567,11 +1566,12 @@ class MyYearPickerState extends State<MyYearPicker> {
             Expanded(
               child: LayoutBuilder(builder: (context, constraints) {
                 final int calcCrossAxisCount =
-                (constraints.maxWidth / itemWidth).floor().clamp(1, 6);
+                    (constraints.maxWidth / itemWidth).floor().clamp(1, 6);
 
                 return GridView.builder(
                   controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: calcCrossAxisCount,
                     childAspectRatio: (widget.width / calcCrossAxisCount) /
@@ -1594,9 +1594,11 @@ class MyYearPickerState extends State<MyYearPicker> {
                             widget.pickerDecoration?.pickerTheme?.hoverRadius ??
                                 defaultRadius),
                         hoverColor:
-                        widget.pickerDecoration?.pickerTheme?.hoverColor ?? Colors.transparent,
+                            widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                                Colors.transparent,
                         focusColor:
-                        widget.pickerDecoration?.pickerTheme?.focusColor ?? Colors.transparent,
+                            widget.pickerDecoration?.pickerTheme?.focusColor ??
+                                Colors.transparent,
                         onTap: () {
                           setState(() {
                             focusedIndex = index;
@@ -1613,11 +1615,13 @@ class MyYearPickerState extends State<MyYearPicker> {
                           widget.onDateChanged(selected);
                         },
                         child: Container(
-                          decoration: _yearTileDecoration(context, isSelected, isFocused),
+                          decoration: _yearTileDecoration(
+                              context, isSelected, isFocused),
                           alignment: Alignment.center,
                           child: Text(
                             year.toString(),
-                            style: _yearTileTextStyle(context, isSelected, isFocused),
+                            style: _yearTileTextStyle(
+                                context, isSelected, isFocused),
                           ),
                         ),
                       ),
@@ -1632,7 +1636,8 @@ class MyYearPickerState extends State<MyYearPicker> {
     );
   }
 
-  BoxDecoration _yearTileDecoration(BuildContext context, bool isSelected, bool isFocused) {
+  BoxDecoration _yearTileDecoration(
+      BuildContext context, bool isSelected, bool isFocused) {
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
           BoxDecoration(
@@ -1655,18 +1660,21 @@ class MyYearPickerState extends State<MyYearPicker> {
     }
   }
 
-  TextStyle _yearTileTextStyle(BuildContext context, bool isSelected, bool isFocused) {
+  TextStyle _yearTileTextStyle(
+      BuildContext context, bool isSelected, bool isFocused) {
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
-          TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold);
+          TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold);
     } else if (isSelected) {
       return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
-          TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold);
+          TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold);
     } else {
       return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
           const TextStyle(color: Colors.black);
     }
   }
 }
-
-
