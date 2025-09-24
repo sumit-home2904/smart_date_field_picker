@@ -206,15 +206,18 @@ class PickerTheme {
 
   /// Style for unselected but enabled cells (default text style).
   final TextStyle? unSelectedTextStyle;
+  final TextStyle? currentMothTextStyle;
 
   /// Decoration for the focused cell (border, background, etc.).
   final BoxDecoration? focusDecoration;
+  final BoxDecoration? disableDecoration;
 
   /// Decoration for the selected cell (border, background, etc.).
   final BoxDecoration? selectedDecoration;
 
   /// Decoration for unselected but enabled cells.
   final BoxDecoration? unSelectedDecoration;
+  final BoxDecoration? currentMonthDecoration;
 
   /// Hover effect radius for cells.
   final double? hoverRadius;
@@ -228,10 +231,13 @@ class PickerTheme {
   const PickerTheme({
     this.disableTextStyle,
     this.focusTextStyle,
+    this.disableDecoration,
+    this.currentMonthDecoration,
     this.selectedTextStyle,
     this.unSelectedTextStyle,
     this.focusDecoration,
     this.selectedDecoration,
+    this.currentMothTextStyle,
     this.unSelectedDecoration,
     this.hoverRadius,
     this.hoverColor,
@@ -242,23 +248,29 @@ class PickerTheme {
   PickerTheme copyWith({
     TextStyle? disableTextStyle,
     TextStyle? focusTextStyle,
+    TextStyle? currentMothTextStyle,
     TextStyle? selectedTextStyle,
     TextStyle? unSelectedTextStyle,
     BoxDecoration? focusDecoration,
     BoxDecoration? selectedDecoration,
     BoxDecoration? unSelectedDecoration,
+    BoxDecoration? currentMonthDecoration,
+    BoxDecoration? disableDecoration,
     double? hoverRadius,
     Color? hoverColor,
     Color? focusColor,
   }) {
     return PickerTheme(
       disableTextStyle: disableTextStyle ?? this.disableTextStyle,
+      currentMonthDecoration: currentMonthDecoration ?? this.currentMonthDecoration,
+      currentMothTextStyle: currentMothTextStyle ?? this.currentMothTextStyle,
       focusTextStyle: focusTextStyle ?? this.focusTextStyle,
       selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
       unSelectedTextStyle: unSelectedTextStyle ?? this.unSelectedTextStyle,
       focusDecoration: focusDecoration ?? this.focusDecoration,
       selectedDecoration: selectedDecoration ?? this.selectedDecoration,
       unSelectedDecoration: unSelectedDecoration ?? this.unSelectedDecoration,
+      disableDecoration: disableDecoration ?? this.disableDecoration,
       hoverRadius: hoverRadius ?? this.hoverRadius,
       hoverColor: hoverColor ?? this.hoverColor,
       focusColor: focusColor ?? this.focusColor,

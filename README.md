@@ -149,19 +149,88 @@ The calendar uses `FocusNode`s to support keyboard navigation and focus cycling.
 
 ---
 
-## Properties
+## 📐 Properties
 
-| Property              | Type                          | Description                                                  |
-|-----------------------|-------------------------------|--------------------------------------------------------------|
-| `initialDate`         | `DateTime`                    | The initially selected date                                  |
-| `firstDate`           | `DateTime?`                   | The earliest date that can be selected                       |
-| `lastDate`            | `DateTime?`                   | The latest date that can be selected                         |
-| `controller`          | `OverlayPortalController`     | Controller for toggling overlay visibility                   |
-| `decoration`          | `InputDecoration`             | Decoration for the input field                               |
-| `pickerDecoration`    | `PickerDecoration?`           | Theme customization for calendar UI                          |
-| `onDateSelected`      | `void Function(DateTime?)`    | Callback when a date is selected                             |
-| `textController`      | `TextEditingController`       | Controller for managing text manually                        |
-| `dropdownOffset`      | `Offset?`                     | Customize dropdown placement                                 |
-| `layerLink`           | `LayerLink`                   | Used for overlay positioning                                 |
+### SmartDateFieldPicker
 
+| Property           | Type                        | Description |
+|--------------------|-----------------------------|-------------|
+| `initialDate`      | `DateTime`                  | The initially selected date |
+| `firstDate`        | `DateTime?`                 | The earliest selectable date |
+| `lastDate`         | `DateTime?`                 | The latest selectable date |
+| `controller`       | `OverlayPortalController`   | Controls the dropdown overlay |
+| `decoration`       | `InputDecoration`           | Input field decoration |
+| `pickerDecoration` | `PickerDecoration?`         | Theme customization for picker UI |
+| `onDateSelected`   | `void Function(DateTime?)`  | Callback when a date is selected |
+| `textController`   | `TextEditingController`     | Manages input text manually |
+| `dropdownOffset`   | `Offset?`                   | Custom dropdown placement |
+| `layerLink`        | `LayerLink`                 | Used for overlay positioning |
+
+### PickerDecoration
+
+| Property                     | Type         | Description |
+|------------------------------|--------------|-------------|
+| `showCursor`                 | `bool?`      | Whether cursor is visible |
+| `cursorColor`                | `Color?`     | Cursor color |
+| `cursorWidth`                | `double?`    | Cursor width |
+| `cursorRadius`               | `Radius?`    | Rounded cursor edges |
+| `textStyle`                  | `TextStyle?` | Input text style |
+| `height`, `width`            | `double?`    | Fixed picker dimensions |
+| `cursorHeight`               | `double?`    | Custom cursor height |
+| `textAlign`                  | `TextAlign?` | Input text alignment |
+| `cursorErrorColor`           | `Color?`     | Cursor error color |
+| `weekTextStyle`              | `TextStyle?` | Weekday label style |
+| `menuDecoration`             | `Decoration?`| Dropdown/overlay decoration |
+| `enableInteractiveSelection` | `bool?`      | Enables text selection |
+| `headerTheme`                | `HeaderTheme?` | Header styling |
+| `pickerTheme`                | `PickerTheme?` | Cell styling |
+
+### HeaderTheme
+
+| Property           | Type                  | Description |
+|--------------------|-----------------------|-------------|
+| `headerTextStyle`  | `TextStyle?`          | Header text style |
+| `focusTextStyle`   | `TextStyle?`          | Focused header text style |
+| `alignment`        | `AlignmentGeometry?`  | Header alignment |
+| `iconDecoration`   | `IconDecoration?`     | Navigation icon styling |
+| `boxDecoration`    | `BoxDecoration?`      | Header box decoration |
+| `headerPadding`    | `EdgeInsetsGeometry?` | Header padding |
+| `headerMargin`     | `EdgeInsetsGeometry?` | Header margin |
+
+### IconDecoration
+
+| Property            | Type       | Description |
+|---------------------|------------|-------------|
+| `leftIcon`          | `IconData?` | Left navigation icon |
+| `rightIcon`         | `IconData?` | Right navigation icon |
+| `leftIconColor`     | `Color?`   | Left icon color |
+| `leftIconSize`      | `double?`  | Left icon size |
+| `rightIconColor`    | `Color?`   | Right icon color |
+| `rightIconSize`     | `double?`  | Right icon size |
+| `leftFocusIconColor`| `Color?`   | Left focus icon color |
+| `rightFocusIconColor`| `Color?`  | Right focus icon color |
+
+### PickerTheme
+
+| Property              | Type            | Description |
+|-----------------------|-----------------|-------------|
+| `disableTextStyle`    | `TextStyle?`    | Disabled cell text style |
+| `focusTextStyle`      | `TextStyle?`    | Focused cell text style |
+| `selectedTextStyle`   | `TextStyle?`    | Selected cell text style |
+| `unSelectedTextStyle` | `TextStyle?`    | Unselected cell text style |
+| `currentMothTextStyle`| `TextStyle?`    | Current month cell text style |
+| `focusDecoration`     | `BoxDecoration?`| Decoration for focused cell |
+| `disableDecoration`   | `BoxDecoration?`| Decoration for disabled cell |
+| `selectedDecoration`  | `BoxDecoration?`| Decoration for selected cell |
+| `unSelectedDecoration`| `BoxDecoration?`| Decoration for unselected cell |
+| `currentMonthDecoration`| `BoxDecoration?`| Decoration for current month cell |
+| `hoverRadius`         | `double?`       | Hover effect radius |
+| `hoverColor`          | `Color?`        | Hover background color |
+| `focusColor`          | `Color?`        | Focus background color |
+
+---
+
+## 📝 License
+
+MIT © 2025 Smart Date Field Picker
 ---

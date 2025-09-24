@@ -1,3 +1,6 @@
+## 1.0.0
+- UI improvements and bug fixes — Date Picker is now stable and ready for production use.
+
 ## 0.0.3+3
 - Initial value issue fixed.
 

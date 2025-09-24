@@ -3,26 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 
-/// A custom month picker widget that shows all 12 months in a grid layout
-/// with keyboard navigation and styling support through [PickerDecoration].
 class MyMonthPicker extends StatefulWidget {
-  /// The date currently being displayed.
   final DateTime currentDisplayDate;
   final DateTime lastDate;
-
-  /// Callback to switch to the year picker.
   final Function() changeToYearPicker;
-
-  /// Callback when a month is selected.
   final Function(DateTime value) onDateChanged;
-
-  /// Custom decoration and styling for the picker.
   final PickerDecoration? pickerDecoration;
-
-  /// The height of the entire picker widget.
   final double height;
-
-  /// The width of the entire picker widget.
   final double width;
 
   const MyMonthPicker({
@@ -41,38 +28,42 @@ class MyMonthPicker extends StatefulWidget {
 }
 
 class _MyMonthPickerState extends State<MyMonthPicker> {
-  /// List of focus nodes for each month tile.
+  static const double defaultRadius = 8.0;
+
   late List<FocusNode> monthFocusNodes;
-
-  /// Focus node for the header (month-year display).
-  FocusNode monthYearFocusNode = FocusNode();
-
-  /// Index of the currently focused month (0-based).
+  final FocusNode monthYearFocusNode = FocusNode();
   late int focusMonthIndex;
-
-  /// List of DateTime objects representing each month of the current year.
   late List<DateTime> monthsList;
 
   @override
   void initState() {
     super.initState();
 
-    // Generate list of months based on currentDisplayDate
     monthsList = List.generate(
       12,
-      (i) => DateTime(widget.currentDisplayDate.year, i + 1, 1),
+          (i) => DateTime(widget.currentDisplayDate.year, i + 1, 1),
     );
 
-    // Create focus nodes for each month tile
     monthFocusNodes = List.generate(12, (_) => FocusNode());
 
-    // Set focus to currently selected month
-    focusMonthIndex = widget.currentDisplayDate.month - 1;
+    // find an initial enabled index: prefer current month if enabled,
+    // otherwise nearest enabled month searching forward then backward
+    final desired = (widget.currentDisplayDate.month - 1).clamp(0, 11);
+    final initial = _nearestEnabledIndex(desired);
+    focusMonthIndex = initial ?? desired; // if none found, fallback to desired
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      monthFocusNodes[focusMonthIndex].requestFocus();
+      if (mounted) {
+        // only request focus if the index is enabled
+        if (_isMonthEnabled(focusMonthIndex)) {
+          monthFocusNodes[focusMonthIndex].requestFocus();
+        } else {
+          // nothing enabled - leave header focusable
+          monthYearFocusNode.requestFocus();
+        }
+      }
     });
 
-    // Rebuild on header focus change
     monthYearFocusNode.addListener(() {
       if (mounted) setState(() {});
     });
@@ -80,36 +71,86 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
 
   @override
   void dispose() {
-    for (final node in monthFocusNodes) {
-      node.dispose();
-    }
+    for (final node in monthFocusNodes) node.dispose();
     monthYearFocusNode.dispose();
     super.dispose();
   }
 
-  /// Moves keyboard focus to the given [newIndex] of month.
-  void moveFocus(int newIndex) {
 
-     if (newIndex >= 0 && newIndex < 12) {
-       setState(() {
-         focusMonthIndex = newIndex;
-         monthFocusNodes[focusMonthIndex].requestFocus();
-       });
-     } else {
-       // Loop focus from end to start or start to end
-       if (newIndex == 12) {
-         setState(() {
-           focusMonthIndex = 0;
-           monthFocusNodes[focusMonthIndex].requestFocus();
-         });
-       }
-       if (newIndex == -1) {
-         setState(() {
-           focusMonthIndex = 11;
-           monthFocusNodes[focusMonthIndex].requestFocus();
-         });
-       }
-     }
+
+  /// Check if a month should be disabled.
+  /// Rules:
+  /// 1) Allow months only up to currentDisplayDate.month (1..month)
+  /// 2) Do not allow months after widget.lastDate (month-year inclusive)
+  /// 3) Ensure the requested day exists in that month
+  bool _isDisabledMonth(DateTime monthDate) {
+    final monthNum = monthDate.month;
+    final year = monthDate.year;
+
+    // Rule 1: month must be <= currentDisplayDate.month
+    if (monthNum  > widget.lastDate.month) return true;
+
+
+    // Rule 2: if month-year is after lastDate's month-year -> disabled
+    if (year > widget.lastDate.year) return true;
+
+    if (year == widget.lastDate.year && monthNum > widget.lastDate.month) return true;
+
+    return false;
+  }
+
+
+  bool _isMonthEnabled(int index) {
+    if (index < 0 || index >= monthsList.length) return false;
+    return !_isDisabledMonth(monthsList[index]);
+  }
+
+  /// Find nearest enabled month index to 'start'. Searches outward (forward then backward).
+  int? _nearestEnabledIndex(int start) {
+    if (_isMonthEnabled(start)) return start;
+
+    for (int d = 1; d < 12; d++) {
+      final fwd = (start + d) % 12;
+      if (_isMonthEnabled(fwd)) return fwd;
+      final back = ((start - d) % 12 + 12) % 12;
+      if (_isMonthEnabled(back)) return back;
+    }
+    return null;
+  }
+
+
+  /// Move focus; skip disabled months. direction can be positive/negative.
+  void moveFocus(int newIndex) {
+    if (!mounted) return;
+
+    // Normalize newIndex within 0..11
+    int idx = ((newIndex % 12) + 12) % 12;
+
+    // If target is enabled, go straight; else step in the direction until find enabled.
+    if (_isMonthEnabled(idx)) {
+      setState(() {
+        focusMonthIndex = idx;
+      });
+      monthFocusNodes[focusMonthIndex].requestFocus();
+      return;
+    }
+
+    // Determine direction: +1 if moving forward overall, -1 if moving backward.
+    final delta = (newIndex - focusMonthIndex) >= 0 ? 1 : -1;
+
+    // Search up to 12 steps
+    for (int i = 1; i <= 12; i++) {
+      idx = ((idx + delta) % 12 + 12) % 12;
+      if (_isMonthEnabled(idx)) {
+        setState(() {
+          focusMonthIndex = idx;
+        });
+        monthFocusNodes[focusMonthIndex].requestFocus();
+        return;
+      }
+    }
+
+    // If none found, do nothing (keep current focus)
   }
 
   int _getValidDay(int year, int month, int originalDay) {
@@ -117,60 +158,67 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     return originalDay <= lastDayOfMonth ? originalDay : lastDayOfMonth;
   }
 
+  void _onActivate() {
+    if (monthYearFocusNode.hasFocus) {
+      widget.changeToYearPicker();
+      return;
+    }
+
+    if (focusMonthIndex >= 0 && focusMonthIndex < 12 && _isMonthEnabled(focusMonthIndex)) {
+      final monthDate = monthsList[focusMonthIndex];
+      final selectedMonth = monthDate.month;
+      final selectedYear = monthDate.year;
+      final adjustedDay = _getValidDay(
+        selectedYear,
+        selectedMonth,
+        widget.currentDisplayDate.day,
+      );
+      widget.onDateChanged(
+        DateTime(selectedYear, selectedMonth, adjustedDay),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final columns = 3;
+    final tileWidth = (widget.width - 20 - ((columns - 1) * 10)) / columns;
+    final rows = 4;
+    final tileHeight = (widget.height - 10 - 48 - ((rows - 1) * 10)) / rows;
+    final childAspectRatio = tileWidth / (tileHeight <= 0 ? 1 : tileHeight);
+
     return CallbackShortcuts(
       bindings: {
-        /// Pressing Tab toggles between header and month grid.
         LogicalKeySet(LogicalKeyboardKey.tab): () {
           if (monthYearFocusNode.hasFocus) {
-            focusMonthIndex = widget.currentDisplayDate.month - 1;
-            FocusScope.of(
-              context,
-            ).requestFocus(monthFocusNodes[focusMonthIndex]);
+            final idx = (widget.currentDisplayDate.month - 1).clamp(0, 11);
+            final nearest = _nearestEnabledIndex(idx);
+            if (nearest != null) {
+              focusMonthIndex = nearest;
+              FocusScope.of(context).requestFocus(monthFocusNodes[focusMonthIndex]);
+            }
           } else {
-            focusMonthIndex = -1;
             monthYearFocusNode.requestFocus();
           }
         },
-
-        /// Arrow navigation between months.
-        LogicalKeySet(LogicalKeyboardKey.arrowRight): () =>
-            moveFocus(focusMonthIndex + 1),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft): () =>
-            moveFocus(focusMonthIndex - 1),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp): () =>
-            moveFocus(focusMonthIndex - 3),
+        LogicalKeySet(LogicalKeyboardKey.arrowRight): () => moveFocus(focusMonthIndex + 1),
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft): () => moveFocus(focusMonthIndex - 1),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp): () => moveFocus(focusMonthIndex - 3),
         LogicalKeySet(LogicalKeyboardKey.arrowDown): () {
           if (monthYearFocusNode.hasFocus) {
-            focusMonthIndex = widget.currentDisplayDate.month - 1;
-            FocusScope.of(
-              context,
-            ).requestFocus(monthFocusNodes[focusMonthIndex]);
+            final idx = (widget.currentDisplayDate.month - 1).clamp(0, 11);
+            final nearest = _nearestEnabledIndex(idx);
+            if (nearest != null) {
+              focusMonthIndex = nearest;
+              FocusScope.of(context).requestFocus(monthFocusNodes[focusMonthIndex]);
+            }
           } else {
             moveFocus(focusMonthIndex + 3);
           }
         },
-
-        /// Enter key selects month or opens year picker if on header.
-        LogicalKeySet(LogicalKeyboardKey.enter): () {
-          if (monthYearFocusNode.hasFocus) {
-            widget.changeToYearPicker();
-          } else {
-            final selectedMonth = monthsList[focusMonthIndex].month;
-            final selectedYear = monthsList[focusMonthIndex].year;
-
-            final adjustedDay = _getValidDay(
-              selectedYear,
-              selectedMonth,
-              widget.currentDisplayDate.day,
-            );
-
-            widget.onDateChanged(
-              DateTime(selectedYear, selectedMonth, adjustedDay),
-            );
-          }
-        },
+        LogicalKeySet(LogicalKeyboardKey.enter): () => _onActivate(),
+        LogicalKeySet(LogicalKeyboardKey.numpadEnter): () => _onActivate(),
+        LogicalKeySet(LogicalKeyboardKey.select): () => _onActivate(),
       },
       child: Material(
         elevation: 0,
@@ -181,40 +229,30 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
           width: widget.width,
           child: Column(
             children: [
-              /// Header displaying the current year.
               Container(
                 width: widget.width,
-                alignment: widget.pickerDecoration?.headerTheme?.alignment ??
-                    Alignment.center,
-                margin: widget.pickerDecoration?.headerTheme?.headerMargin ??
-                    EdgeInsets.zero,
-                padding: widget.pickerDecoration?.headerTheme?.headerPadding ??
-                    EdgeInsets.all(10),
-                decoration:
-                    widget.pickerDecoration?.headerTheme?.boxDecoration ??
-                        BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
-                          ),
-                        ),
+                alignment: widget.pickerDecoration?.headerTheme?.alignment ?? Alignment.center,
+                margin: widget.pickerDecoration?.headerTheme?.headerMargin ?? EdgeInsets.zero,
+                padding: widget.pickerDecoration?.headerTheme?.headerPadding ?? EdgeInsets.all(10),
+                decoration: widget.pickerDecoration?.headerTheme?.boxDecoration ??
+                    BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                    ),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
                     focusNode: monthYearFocusNode,
-                    focusColor:
-                        widget.pickerDecoration?.pickerTheme?.focusColor ??
-                            Colors.white,
-                    hoverColor:
-                        widget.pickerDecoration?.pickerTheme?.hoverColor ??
-                            Colors.white12,
+                    focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ?? Colors.white,
+                    hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ?? Colors.white12,
                     borderRadius: BorderRadius.circular(
-                        widget.pickerDecoration?.pickerTheme?.hoverRadius ??
-                            defaultRadius),
+                        widget.pickerDecoration?.pickerTheme?.hoverRadius ?? defaultRadius),
                     onTap: () => widget.changeToYearPicker(),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 6),
                       child: Text(
                         "Jan - Dec ${widget.currentDisplayDate.year}",
                         style: headerStyle(),
@@ -223,58 +261,67 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                   ),
                 ),
               ),
-
-              /// Month grid
               Expanded(
                 child: GridView.builder(
                   physics: const ClampingScrollPhysics(),
                   padding: const EdgeInsets.all(10),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
+                    crossAxisCount: columns,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
-                    childAspectRatio:
-                        (widget.width / 2.5) / (widget.height / 4),
+                    childAspectRatio: childAspectRatio,
                   ),
                   itemCount: 12,
                   itemBuilder: (context, index) {
-                    final isSelected =
-                        index == widget.currentDisplayDate.month - 1;
+                    final monthDate = monthsList[index];
+                    final isSelected = index == widget.currentDisplayDate.month - 1;
                     final isFocused = index == focusMonthIndex;
+                    final disabled = _isDisabledMonth(monthDate);
+
+                    final textStyle = monthStyle(isSelected, isFocused);
+                    final decoration = monthDecoration(isSelected, isFocused);
 
                     return Focus(
                       focusNode: monthFocusNodes[index],
+                      canRequestFocus: !disabled,
                       child: InkWell(
-                        hoverColor:
-                            widget.pickerDecoration?.pickerTheme?.hoverColor ??
-                                Colors.transparent,
-                        focusColor:
-                            widget.pickerDecoration?.pickerTheme?.focusColor ??
-                                Colors.transparent,
-                        borderRadius: BorderRadius.circular(
-                            widget.pickerDecoration?.pickerTheme?.hoverRadius ??
-                                defaultRadius),
-                        onTap: () {
-                          final selectedMonth = monthsList[index].month;
-                          final selectedYear = monthsList[index].year;
-
+                        onTap: disabled
+                            ? null
+                            : () {
+                          final selectedMonth = monthDate.month;
+                          final selectedYear = monthDate.year;
                           final adjustedDay = _getValidDay(
                             selectedYear,
                             selectedMonth,
                             widget.currentDisplayDate.day,
                           );
-
                           widget.onDateChanged(
                             DateTime(selectedYear, selectedMonth, adjustedDay),
                           );
                         },
+                        borderRadius: BorderRadius.circular(
+                            widget.pickerDecoration?.pickerTheme?.hoverRadius ?? defaultRadius),
+                        hoverColor: widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                            Colors.transparent,
+                        focusColor: widget.pickerDecoration?.pickerTheme?.focusColor ??
+                            Colors.transparent,
                         child: Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: monthDecoration(isSelected, isFocused),
+                          decoration: disabled
+                              ? decoration.copyWith(
+                            color: Colors.grey.withValues(alpha: 0.06),
+                            border: Border.all(color: Colors.grey.shade300),
+                          )
+                              : decoration,
                           alignment: Alignment.center,
-                          child: Text(
-                            DateFormat.MMM().format(monthsList[index]),
-                            style: monthStyle(isSelected, isFocused),
+                          child: Semantics(
+                            button: true,
+                            enabled: !disabled,
+                            selected: isSelected,
+                            child: Text(
+                              DateFormat.MMM().format(monthDate),
+                              style: disabled ? textStyle.copyWith(color: Colors.grey) : textStyle,
+                            ),
                           ),
                         ),
                       ),
@@ -289,7 +336,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     );
   }
 
-  /// Returns the text style for each month tile.
   TextStyle monthStyle(bool isSelected, bool isFocused) {
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
@@ -309,7 +355,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     }
   }
 
-  /// Returns the header text style, adapting to focus state.
   TextStyle headerStyle() {
     if (monthYearFocusNode.hasFocus) {
       return widget.pickerDecoration?.headerTheme?.focusTextStyle ??
@@ -328,7 +373,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     }
   }
 
-  /// Returns the decoration for each month tile depending on selection/focus.
   BoxDecoration monthDecoration(bool isSelected, bool isFocused) {
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusDecoration ??

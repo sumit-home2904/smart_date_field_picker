@@ -67,16 +67,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 Expanded(
                   child: SmartDateFieldPicker(
-                    firstDate:DateTime(1900),
-                    lastDate: DateTime(2025,3,20),
+                    firstDate:DateTime(1900,1,31),
+                    lastDate: DateTime(2025,1,12),
                     pickerDecoration: PickerDecoration(
-                        width: 270
+                        width: 270,
                     ),
                     initialDate: initDate1,
                     controller: controller1,
                     onDateSelected: (value) {
                       setState(() {
-                        initDate1 = value ?? DateTime.now();
+                        initDate1 = value;
                       });
                     },
                   ),

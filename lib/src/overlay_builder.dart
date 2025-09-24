@@ -7,6 +7,12 @@ import 'package:smart_date_field_picker/src/year_picker.dart';
 import 'package:smart_date_field_picker/src/month_picker.dart';
 import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 
+/// A FocusNode that never requests or accepts focus — used so disabled cells can't be focused.
+class AlwaysDisabledFocusNode extends FocusNode {
+  @override
+  bool get canRequestFocus => false;
+}
+
 class OverlayBuilder extends StatefulWidget {
   /// Controller for showing or hiding the dropdown overlay.
   final OverlayPortalController controller;
@@ -119,11 +125,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   void initState() {
     super.initState();
 
-    // Initialize display and selected dates.
-    // _currentDisplayDate = widget.initialDate ?? DateTime.now();
-    // selectedDate = widget.initialDate ?? DateTime.now();
-    // focusSelectedDate = widget.initialDate ?? DateTime.now();
-
     if (widget.initialDate != null) {
       _currentDisplayDate = widget.initialDate!;
       selectedDate = widget.initialDate!;
@@ -132,7 +133,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       // take only year & month from lastDate, and set to last day of that month
       final year = widget.lastDate.year;
       final month = widget.lastDate.month;
-      final lastDay = DateTime(year, month + 1, 0); // gives last day of month
+      final day = widget.lastDate.day;
+      final lastDay = DateTime(year, month,day); // gives last day of month
       _currentDisplayDate = lastDay;
       selectedDate = lastDay;
       focusSelectedDate = lastDay;
@@ -146,7 +148,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       checkRenderObjects();
     });
 
-    final effectiveLastDate = _normalizeLastDate(widget.lastDate);
 
 
     // Rebuild when arrow buttons or header gains/loses focus.
@@ -337,7 +338,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           // If this would push overlay beyond left edge, clamp to padding
           dx = _screenPadding - anchorX;
         }
-        return Offset(dx, dy);
+        return Offset(dx - 08, dy);
       }
 
       // 2) If overlay left-aligned would overflow left (anchorX < padding),
@@ -531,26 +532,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     }
   }
 
-  /// Checks if user can navigate to the next month based on `lastDate` constraint.
-/*  bool _canNavigateToNextMonth() {
-    DateTime firstOfMonth = DateTime(
-      _currentDisplayDate.year,
-      _currentDisplayDate.month,
-      1,
-    );
-    DateTime firstOfNextMonth = DateTime(
-      firstOfMonth.year,
-      firstOfMonth.month + 1,
-      1,
-    );
 
-    print("object1 ${!firstOfNextMonth.isAfter(DateTime(widget.lastDate.year, widget.lastDate.month, 1))}");
-    return !firstOfNextMonth.isAfter(
-      DateTime(widget.lastDate.year, widget.lastDate.month, 1),
-    );
-  }*/
-
-
+/*
   DateTime _normalizeLastDate(DateTime d) {
     // if caller only set year and left month/day as 1 (common when writing DateTime(2025)),
     // treat that as full year unless they explicitly passed month/day.
@@ -559,6 +542,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     }
     return d;
   }
+*/
 
 
 
@@ -576,7 +560,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     // Last allowed day for the month of widget.lastDate.
     // DateTime(year, month + 1, 0) gives last day of (year, month).
 
-    print("widget.lastDate.month ${widget.lastDate.month}");
     final DateTime lastAllowedDay = DateTime(
       widget.lastDate.year,
       widget.lastDate.month + 1,
@@ -900,7 +883,13 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                 final isSelected = date.year == selectedDate.year &&
                     date.month == selectedDate.month &&
                     date.day == selectedDate.day;
-                final isFocusDate = date.year == focusSelectedDate.year &&
+
+                // NEW: consider date disabled if outside allowed range
+                final bool isDisabled = date.isBefore(widget.firstDate) || date.isAfter(widget.lastDate);
+
+                // Focus logic: only show focus if this date is the focused date AND it's not disabled
+                final isFocusDate = !isDisabled &&
+                    date.year == focusSelectedDate.year &&
                     date.month == focusSelectedDate.month &&
                     date.day == focusSelectedDate.day &&
                     dateFocusNode.hasFocus;
@@ -908,18 +897,21 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                 return Material(
                   color: Colors.transparent,
                   child: Focus(
-                    focusNode: dateFocusNode,
+                    focusNode: isDisabled ? AlwaysDisabledFocusNode() : dateFocusNode,
                     child: InkWell(
                       focusColor:
-                          widget.pickerDecoration?.pickerTheme?.focusColor ??
-                              Colors.white,
+                      widget.pickerDecoration?.pickerTheme?.focusColor ??
+                          Colors.white,
                       hoverColor:
-                          widget.pickerDecoration?.pickerTheme?.hoverColor ??
-                              Colors.white12,
+                      widget.pickerDecoration?.pickerTheme?.hoverColor ??
+                          Colors.white12,
                       borderRadius: BorderRadius.circular(
                           widget.pickerDecoration?.pickerTheme?.hoverRadius ??
                               defaultRadius),
-                      onTap: () {
+                      // Disable tapping for out-of-range dates
+                      onTap: isDisabled
+                          ? null
+                          : () {
                         setState(() {
                           focusSelectedDate = date;
                         });
@@ -931,6 +923,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                           isCurrentMonth,
                           isFocusDate,
                           isSelected,
+                          isDisabled, // <-- pass disabled flag
                         ),
                         alignment: Alignment.center,
                         child: Text(
@@ -939,6 +932,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                             isCurrentMonth,
                             isFocusDate,
                             isSelected,
+                            isDisabled, // <-- pass disabled flag
                           ),
                         ),
                       ),
@@ -954,11 +948,77 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   /// Returns the decoration for each day cell based on its state (selected, focused, etc.).
+  // BoxDecoration dayDecoration(bool isCurrentMonth, bool isFocusDate, bool isSelected,) {
+  //   // If the current date is also focused → show focusDecoration
+  //   if (isFocusDate) {
+  //     return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
+  //         BoxDecoration(
+  //           color: Colors.transparent,
+  //           borderRadius: BorderRadius.circular(6),
+  //           border: Border.all(color: Theme.of(context).primaryColor),
+  //         );
+  //   }
+  //
+  //   // Selected date in current month
+  //   if (isCurrentMonth && isSelected) {
+  //     return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
+  //         BoxDecoration(
+  //           color: Theme.of(context).primaryColor,
+  //           borderRadius: BorderRadius.circular(6),
+  //         );
+  //   }
+  //
+  //   // Unselected date outside current month
+  //   if (!isCurrentMonth && !isSelected) {
+  //     return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
+  //         BoxDecoration(
+  //           color: Colors.transparent,
+  //           borderRadius: BorderRadius.circular(6),
+  //         );
+  //   }
+  //
+  //   return BoxDecoration();
+  // }
+  //
+  // /// Returns the text style for day numbers based on their state.
+  // TextStyle dayTextStyle(bool isCurrentMonth, bool isFocusDate, bool isSelected,) {
+  //   // Focus takes highest priority (even if it's the current date or selected)
+  //   if (isFocusDate) {
+  //     return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
+  //         TextStyle(color: Theme.of(context).primaryColor);
+  //   }
+  //
+  //   // Selected date in current month
+  //   if (isCurrentMonth && isSelected) {
+  //     return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
+  //         TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+  //   }
+  //
+  //   // Unselected date in current month
+  //   if (isCurrentMonth) {
+  //     return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
+  //         TextStyle(color: Colors.black);
+  //   }
+  //
+  //   // Disabled (dates outside current month)
+  //   return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
+  //       TextStyle(color: Colors.grey);
+  // }
+
   BoxDecoration dayDecoration(
-    bool isCurrentMonth,
-    bool isFocusDate,
-    bool isSelected,
-  ) {
+      bool isCurrentMonth,
+      bool isFocusDate,
+      bool isSelected,
+      bool isDisabled,
+      ) {
+    // Disabled state highest priority for decoration
+    if (isDisabled) {
+      return widget.pickerDecoration?.pickerTheme?.disableDecoration ??
+          BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          );
+    }
     // If the current date is also focused → show focusDecoration
     if (isFocusDate) {
       return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
@@ -987,37 +1047,52 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
           );
     }
 
-    return BoxDecoration();
+    return widget.pickerDecoration?.pickerTheme?.currentMonthDecoration ??
+        BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+        );
   }
 
-  /// Returns the text style for day numbers based on their state.
+
+
   TextStyle dayTextStyle(
-    bool isCurrentMonth,
-    bool isFocusDate,
-    bool isSelected,
-  ) {
-    // Focus takes highest priority (even if it's the current date or selected)
+      bool isCurrentMonth,
+      bool isFocusDate,
+      bool isSelected,
+      bool isDisabled,
+      ) {
+
+
+    // Disabled highest priority
+    if (isDisabled) {
+      return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
+          TextStyle(color: Colors.grey);
+    }
+
+    // Focused state
     if (isFocusDate) {
       return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
           TextStyle(color: Theme.of(context).primaryColor);
     }
 
-    // Selected date in current month
+    // Selected in current month
     if (isCurrentMonth && isSelected) {
       return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
           TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
     }
 
-    // Unselected date in current month
-    if (isCurrentMonth) {
+    // Unselected and outside current month
+    if (!isCurrentMonth && !isSelected) {
       return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
-          TextStyle(color: Colors.black);
+          TextStyle(color: Colors.grey);
     }
 
-    // Disabled (dates outside current month)
-    return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
-        TextStyle(color: Colors.grey);
+    // Default fallback (treat as unselected current-month)
+    return widget.pickerDecoration?.pickerTheme?.currentMothTextStyle ??
+        TextStyle(color: Colors.black);
   }
+
 
   /// Builds headers for weekdays (Mon, Tue, etc.) aligned with the calendar grid.
   Widget _buildWeekdayHeaders() {
@@ -1147,7 +1222,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                           setState(() {
                             _currentDisplayDate = date;
                             focusSelectedDate = date;
-                            print(date);
                             dateFocusNode.requestFocus();
                             canShowMonth = false;
                             canShowDate = true;
