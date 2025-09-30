@@ -71,7 +71,9 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
 
   @override
   void dispose() {
-    for (final node in monthFocusNodes) node.dispose();
+    for (final node in monthFocusNodes) {
+      node.dispose();
+    }
     monthYearFocusNode.dispose();
     super.dispose();
   }
@@ -82,20 +84,28 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
   /// 2) Do not allow months after widget.lastDate (month-year inclusive)
   /// 3) Ensure the requested day exists in that month
   bool _isDisabledMonth(DateTime monthDate) {
-    final monthNum = monthDate.month;
-    final year = monthDate.year;
 
-    // Rule 1: month must be <= currentDisplayDate.month
-    if (monthNum > widget.lastDate.month) return true;
+    if(widget.currentDisplayDate.year < widget.lastDate.year) {
+      return false;
+    }else {
+      final monthNum = monthDate.month;
+      final year = monthDate.year;
 
-    // Rule 2: if month-year is after lastDate's month-year -> disabled
-    if (year > widget.lastDate.year) return true;
+      // Rule 1: month must be <= currentDisplayDate.month
+      if (monthNum > widget.lastDate.month) return true;
 
-    if (year == widget.lastDate.year && monthNum > widget.lastDate.month)
-      return true;
+      // Rule 2: if month-year is after lastDate's month-year -> disabled
+      if (year > widget.lastDate.year) return true;
 
-    return false;
+      if (year == widget.lastDate.year && monthNum > widget.lastDate.month) {
+        return true;
+      }
+
+      return false;
+    }
   }
+
+
 
   bool _isMonthEnabled(int index) {
     if (index < 0 || index >= monthsList.length) return false;
@@ -287,13 +297,12 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                   itemCount: 12,
                   itemBuilder: (context, index) {
                     final monthDate = monthsList[index];
-                    final isSelected =
-                        index == widget.currentDisplayDate.month - 1;
-                    final isFocused = index == focusMonthIndex;
-                    final disabled = _isDisabledMonth(monthDate);
+                    final isSelected = index == widget.currentDisplayDate.month - 1;
 
+                    final disabled = _isDisabledMonth(monthDate);
+                    final isFocused = index == focusMonthIndex;
                     final textStyle = monthStyle(isSelected, isFocused);
-                    final decoration = monthDecoration(isSelected, isFocused);
+                    final decoration = monthDecoration(isSelected, isFocused,isSelected,disabled);
 
                     return Focus(
                       focusNode: monthFocusNodes[index],
@@ -394,20 +403,35 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     }
   }
 
-  BoxDecoration monthDecoration(bool isSelected, bool isFocused) {
+  BoxDecoration monthDecoration(bool isSelected, bool isFocused, bool isCurrentMonth,bool isDisabled,) {
+    // Disabled state highest priority for decoration
+    if (isDisabled) {
+      return widget.pickerDecoration?.pickerTheme?.disableDecoration ??
+          BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          );
+    }
+    // If the current date is also focused → show focusDecoration
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
           BoxDecoration(
             borderRadius: BorderRadius.circular(defaultRadius),
             border: Border.all(color: Theme.of(context).primaryColor, width: 2),
           );
-    } else if (isSelected) {
+    }
+
+    // Selected date in current month
+    if (isCurrentMonth && isSelected) {
       return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
           BoxDecoration(
             borderRadius: BorderRadius.circular(defaultRadius),
             border: Border.all(color: Theme.of(context).primaryColor),
           );
-    } else {
+    }
+
+    // Unselected date outside current month
+    if (!isCurrentMonth && !isSelected) {
       return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
           BoxDecoration(
             color: Colors.transparent,
@@ -415,5 +439,11 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
             border: Border.all(color: Colors.grey[300]!),
           );
     }
+
+    return widget.pickerDecoration?.pickerTheme?.currentMonthDecoration ??
+        BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+        );
   }
 }

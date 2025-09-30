@@ -475,23 +475,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   /// Checks if user can navigate to the previous month based on `firstDate` constraint.
-  /* bool _canNavigateToPreviousMonth() {
-    DateTime firstOfMonth = DateTime(
-      _currentDisplayDate.year,
-      _currentDisplayDate.month,
-      1,
-    );
-    DateTime firstOfPreviousMonth = DateTime(
-      firstOfMonth.year,
-      firstOfMonth.month - 1,
-      1,
-    );
-
-    return !firstOfPreviousMonth.isBefore(
-      DateTime(widget.firstDate.year, widget.firstDate.month, 1),
-    );
-  }*/
-
   bool _canNavigateToPreviousMonth() {
     final firstOfPreviousMonth = DateTime(
       _currentDisplayDate.year,
@@ -526,16 +509,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     }
   }
 
-/*
-  DateTime _normalizeLastDate(DateTime d) {
-    // if caller only set year and left month/day as 1 (common when writing DateTime(2025)),
-    // treat that as full year unless they explicitly passed month/day.
-    if (d.month == 1 && d.day == 1 && d.hour == 0 && d.minute == 0 && d.second == 0) {
-      return DateTime(d.year, 12, 31);
-    }
-    return d;
-  }
-*/
 
   /// Checks if user can navigate to the next month based on `lastDate` constraint.
   /// This compares the first day of the next month vs the LAST day of widget.lastDate's month.
@@ -939,63 +912,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   /// Returns the decoration for each day cell based on its state (selected, focused, etc.).
-  // BoxDecoration dayDecoration(bool isCurrentMonth, bool isFocusDate, bool isSelected,) {
-  //   // If the current date is also focused → show focusDecoration
-  //   if (isFocusDate) {
-  //     return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
-  //         BoxDecoration(
-  //           color: Colors.transparent,
-  //           borderRadius: BorderRadius.circular(6),
-  //           border: Border.all(color: Theme.of(context).primaryColor),
-  //         );
-  //   }
-  //
-  //   // Selected date in current month
-  //   if (isCurrentMonth && isSelected) {
-  //     return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
-  //         BoxDecoration(
-  //           color: Theme.of(context).primaryColor,
-  //           borderRadius: BorderRadius.circular(6),
-  //         );
-  //   }
-  //
-  //   // Unselected date outside current month
-  //   if (!isCurrentMonth && !isSelected) {
-  //     return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
-  //         BoxDecoration(
-  //           color: Colors.transparent,
-  //           borderRadius: BorderRadius.circular(6),
-  //         );
-  //   }
-  //
-  //   return BoxDecoration();
-  // }
-  //
-  // /// Returns the text style for day numbers based on their state.
-  // TextStyle dayTextStyle(bool isCurrentMonth, bool isFocusDate, bool isSelected,) {
-  //   // Focus takes highest priority (even if it's the current date or selected)
-  //   if (isFocusDate) {
-  //     return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
-  //         TextStyle(color: Theme.of(context).primaryColor);
-  //   }
-  //
-  //   // Selected date in current month
-  //   if (isCurrentMonth && isSelected) {
-  //     return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
-  //         TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
-  //   }
-  //
-  //   // Unselected date in current month
-  //   if (isCurrentMonth) {
-  //     return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
-  //         TextStyle(color: Colors.black);
-  //   }
-  //
-  //   // Disabled (dates outside current month)
-  //   return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
-  //       TextStyle(color: Colors.grey);
-  // }
-
   BoxDecoration dayDecoration(
     bool isCurrentMonth,
     bool isFocusDate,

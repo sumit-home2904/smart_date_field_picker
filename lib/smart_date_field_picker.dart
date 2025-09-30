@@ -175,41 +175,44 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
   void didUpdateWidget(covariant SmartDateFieldPicker oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // If parent changed the focusNode, update local reference (but don't dispose parent's node).
-    if (oldWidget.focusNode != widget.focusNode) {
-      if (oldWidget.focusNode == null && widget.focusNode != null) {
-        // we created one previously, but now parent provides — dispose internal and use parent's
-        try {
-          focusNode.dispose();
-        } catch (_) {}
-        focusNode = widget.focusNode!;
-      } else if (oldWidget.focusNode != widget.focusNode &&
-          widget.focusNode == null) {
-        // parent removed their focusNode: create our own
-        focusNode = FocusNode();
-      }
-    }
-
     // If the initialDate changed, update text and mask.
     if (widget.initialDate != oldWidget.initialDate) {
-      if (widget.initialDate != null) {
-        // Post frame to avoid calling setState during build
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final newText = DateFormat("dd/MM/yyyy").format(widget.initialDate!);
-          textController.text = newText;
-          widget.onDateSelected(widget.initialDate!);
-          maskFormatter = _createMask(initialText: newText);
-          setState(() {});
-        });
-      } else {
-        // initialDate removed -> clear field
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          textController.clear();
+      // Use postFrame to avoid setState during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // If parent cleared the initialDate (set to null) -> clear field & reset mask
+        if (widget.initialDate == null) {
+          if (textController.text.isNotEmpty) {
+            textController.clear();
+          }
+          // Notify parent that date is cleared
           widget.onDateSelected(null);
+
+          // Reset mask to empty initial text
           maskFormatter = _createMask(initialText: "");
-          setState(() {});
-        });
-      }
+
+          // Update UI
+          if (mounted) setState(() {});
+          return;
+        }
+
+        // Otherwise initialDate is non-null -> set properly formatted text
+        final newText = DateFormat("dd/MM/yyyy").format(widget.initialDate!);
+
+        // Only update if different (avoids unnecessary rebuilds)
+        if (textController.text != newText) {
+          textController.text = newText;
+          textController.selection =
+              TextSelection.collapsed(offset: newText.length);
+        }
+
+        // Notify parent of the selected date (keeps behavior same as before)
+        widget.onDateSelected(widget.initialDate!);
+
+        // Update mask to match new text
+        maskFormatter = _createMask(initialText: newText);
+
+        if (mounted) setState(() {});
+      });
     }
 
     // If firstDate/lastDate props changed, recompute range
@@ -309,6 +312,10 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
 
         return GestureDetector(
           onTap: () {
+            // if(textController.text.isEmpty){
+            //   textController.clear();
+            //   widget.onDateSelected(null);
+            // }
             // Tapping outside should close the dropdown.
             widget.controller.hide();
           },
@@ -363,11 +370,30 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
             onTap: () => textFiledOnTap(),
             inputFormatters: [maskFormatter],
             keyboardType: TextInputType.number,
-            onChanged: (value) => dropDownOpen(),
-            /*onFieldSubmitted: (value) {
-              widget.controller.hide();
+            onChanged: (value) {
+              // Always try to open dropdown when user types
+              dropDownOpen();
 
-            },*/
+              // Get unmasked value (only digits)
+              final unmasked = maskFormatter.getUnmaskedText();
+
+              // For mask '##/##/####' we expect 8 digits (ddmmyyyy)
+              if (unmasked.length == 8) {
+                // _trySetDateFromText() in your code throws on invalid input.
+                // Catch exceptions here to avoid uncaught exceptions while typing.
+                try {
+                  _trySetDateFromText();
+                } catch (_) {
+
+                }
+              }
+
+              if(value.isEmpty){
+                  textController.clear();
+                  widget.onDateSelected(null);
+              }
+            },
+
             style: widget.pickerDecoration?.textStyle,
             onSaved: (newValue) {
               maskFormatter = MaskTextInputFormatter(
@@ -377,15 +403,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                   initialText: textController.text);
               setState(() {});
             },
-            /* onEditingComplete: () {
-              maskFormatter = MaskTextInputFormatter(
-                  mask: '##/##/####',
-                  filter: {"#": RegExp(r'[0-9]')},
-                  type: MaskAutoCompletionType.lazy,
-                  initialText: textController.text
-              );
-              setState(() {});
-            },*/
+
             onFieldSubmitted: (value) {
               widget.controller.hide();
               // When user presses Enter / Submit on keyboard
