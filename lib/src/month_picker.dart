@@ -28,7 +28,6 @@ class MyMonthPicker extends StatefulWidget {
 }
 
 class _MyMonthPickerState extends State<MyMonthPicker> {
-
   late List<FocusNode> monthFocusNodes;
   final FocusNode monthYearFocusNode = FocusNode();
   late int focusMonthIndex;
@@ -83,10 +82,9 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
   /// 2) Do not allow months after widget.lastDate (month-year inclusive)
   /// 3) Ensure the requested day exists in that month
   bool _isDisabledMonth(DateTime monthDate) {
-
-    if(widget.currentDisplayDate.year < widget.lastDate.year) {
+    if (widget.currentDisplayDate.year < widget.lastDate.year) {
       return false;
-    }else {
+    } else {
       final monthNum = monthDate.month;
       final year = monthDate.year;
 
@@ -103,8 +101,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
       return false;
     }
   }
-
-
 
   bool _isMonthEnabled(int index) {
     if (index < 0 || index >= monthsList.length) return false;
@@ -296,11 +292,14 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                   itemCount: 12,
                   itemBuilder: (context, index) {
                     final monthDate = monthsList[index];
-                    final isSelected = index == widget.currentDisplayDate.month - 1;
+                    final isSelected =
+                        index == widget.currentDisplayDate.month - 1;
                     final disabled = _isDisabledMonth(monthDate);
                     final isFocused = index == focusMonthIndex;
-                    final textStyle = monthStyle(isSelected, isFocused,disabled);
-                    final decoration = monthDecoration(isSelected, isFocused,disabled);
+                    final textStyle =
+                        monthStyle(isSelected, isFocused, disabled);
+                    final decoration =
+                        monthDecoration(isSelected, isFocused, disabled);
 
                     return Focus(
                       focusNode: monthFocusNodes[index],
@@ -358,7 +357,7 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     );
   }
 
-  TextStyle monthStyle(bool isSelected, bool isFocused,bool isDisabled) {
+  TextStyle monthStyle(bool isSelected, bool isFocused, bool isDisabled) {
     if (isDisabled) {
       return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
           TextStyle(
@@ -366,7 +365,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
             fontWeight: FontWeight.bold,
           );
     }
-
 
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
@@ -386,7 +384,6 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
 
     return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
         const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
-
   }
 
   TextStyle headerStyle() {
@@ -407,7 +404,8 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     }
   }
 
-  BoxDecoration monthDecoration(bool isSelected, bool isFocused,bool isDisabled) {
+  BoxDecoration monthDecoration(
+      bool isSelected, bool isFocused, bool isDisabled) {
     // Disabled state highest priority for decoration
     if (isDisabled) {
       return widget.pickerDecoration?.pickerTheme?.disableDecoration ??

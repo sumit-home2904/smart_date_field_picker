@@ -29,7 +29,6 @@ class MyYearPicker extends StatefulWidget {
 }
 
 class MyYearPickerState extends State<MyYearPicker> {
-
   late List<int> yearList;
   late List<FocusNode> yearFocusNodes;
   late List<GlobalKey> yearItemKeys;
@@ -450,7 +449,8 @@ class MyYearPickerState extends State<MyYearPicker> {
     }
   }
 
-  TextStyle _yearTileTextStyle(BuildContext context, bool isSelected, bool isFocused) {
+  TextStyle _yearTileTextStyle(
+      BuildContext context, bool isSelected, bool isFocused) {
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
           TextStyle(

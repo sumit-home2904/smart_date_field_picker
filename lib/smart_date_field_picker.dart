@@ -383,17 +383,14 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                 // Catch exceptions here to avoid uncaught exceptions while typing.
                 try {
                   _trySetDateFromText();
-                } catch (_) {
-
-                }
+                } catch (_) {}
               }
 
-              if(value.isEmpty){
-                  textController.clear();
-                  widget.onDateSelected(null);
+              if (value.isEmpty) {
+                textController.clear();
+                widget.onDateSelected(null);
               }
             },
-
             style: widget.pickerDecoration?.textStyle,
             onSaved: (newValue) {
               maskFormatter = MaskTextInputFormatter(
@@ -403,7 +400,6 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
                   initialText: textController.text);
               setState(() {});
             },
-
             onFieldSubmitted: (value) {
               widget.controller.hide();
               // When user presses Enter / Submit on keyboard

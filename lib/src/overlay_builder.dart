@@ -509,7 +509,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     }
   }
 
-
   /// Checks if user can navigate to the next month based on `lastDate` constraint.
   /// This compares the first day of the next month vs the LAST day of widget.lastDate's month.
   bool _canNavigateToNextMonth() {
