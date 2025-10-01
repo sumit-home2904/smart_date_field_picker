@@ -6,7 +6,7 @@ issue_tracker: https://github.com/sumit-home2904/smart_date_field_picker/issues
 Publisher: Sumit Sharma
 license: MIT
 
-version: 1.0.0
+version: 1.1.0
 
 environment:
   sdk: ^3.5.3
