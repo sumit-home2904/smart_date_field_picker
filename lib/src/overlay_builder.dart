@@ -923,7 +923,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       return widget.pickerDecoration?.pickerTheme?.disableDecoration ??
           BoxDecoration(
             color: Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
           );
     }
     // If the current date is also focused → show focusDecoration
@@ -931,7 +930,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
           BoxDecoration(
             color: Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
             border: Border.all(color: Theme.of(context).primaryColor),
           );
     }
@@ -941,7 +939,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
           BoxDecoration(
             color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(6),
           );
     }
 
@@ -950,14 +947,12 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
           BoxDecoration(
             color: Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
           );
     }
 
     return widget.pickerDecoration?.pickerTheme?.currentMonthDecoration ??
         BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
         );
   }
 

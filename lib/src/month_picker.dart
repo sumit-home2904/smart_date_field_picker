@@ -28,7 +28,6 @@ class MyMonthPicker extends StatefulWidget {
 }
 
 class _MyMonthPickerState extends State<MyMonthPicker> {
-  static const double defaultRadius = 8.0;
 
   late List<FocusNode> monthFocusNodes;
   final FocusNode monthYearFocusNode = FocusNode();
@@ -298,11 +297,10 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                   itemBuilder: (context, index) {
                     final monthDate = monthsList[index];
                     final isSelected = index == widget.currentDisplayDate.month - 1;
-
                     final disabled = _isDisabledMonth(monthDate);
                     final isFocused = index == focusMonthIndex;
-                    final textStyle = monthStyle(isSelected, isFocused);
-                    final decoration = monthDecoration(isSelected, isFocused,isSelected,disabled);
+                    final textStyle = monthStyle(isSelected, isFocused,disabled);
+                    final decoration = monthDecoration(isSelected, isFocused,disabled);
 
                     return Focus(
                       focusNode: monthFocusNodes[index],
@@ -334,13 +332,7 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
                                 Colors.transparent,
                         child: Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: disabled
-                              ? decoration.copyWith(
-                                  color: Colors.grey.withValues(alpha: 0.06),
-                                  border:
-                                      Border.all(color: Colors.grey.shade300),
-                                )
-                              : decoration,
+                          decoration: decoration,
                           alignment: Alignment.center,
                           child: Semantics(
                             button: true,
@@ -366,23 +358,35 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     );
   }
 
-  TextStyle monthStyle(bool isSelected, bool isFocused) {
+  TextStyle monthStyle(bool isSelected, bool isFocused,bool isDisabled) {
+    if (isDisabled) {
+      return widget.pickerDecoration?.pickerTheme?.disableTextStyle ??
+          TextStyle(
+            color: Colors.transparent,
+            fontWeight: FontWeight.bold,
+          );
+    }
+
+
     if (isFocused) {
       return widget.pickerDecoration?.pickerTheme?.focusTextStyle ??
           TextStyle(
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           );
-    } else if (isSelected) {
+    }
+
+    if (isSelected) {
       return widget.pickerDecoration?.pickerTheme?.selectedTextStyle ??
           TextStyle(
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           );
-    } else {
-      return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
-          const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
     }
+
+    return widget.pickerDecoration?.pickerTheme?.unSelectedTextStyle ??
+        const TextStyle(color: Colors.black, fontWeight: FontWeight.normal);
+
   }
 
   TextStyle headerStyle() {
@@ -403,7 +407,37 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
     }
   }
 
-  BoxDecoration monthDecoration(bool isSelected, bool isFocused, bool isCurrentMonth,bool isDisabled,) {
+  BoxDecoration monthDecoration(bool isSelected, bool isFocused,bool isDisabled) {
+    // Disabled state highest priority for decoration
+    if (isDisabled) {
+      return widget.pickerDecoration?.pickerTheme?.disableDecoration ??
+          BoxDecoration(
+            color: Colors.transparent,
+          );
+    }
+
+    if (isFocused) {
+      return widget.pickerDecoration?.pickerTheme?.focusDecoration ??
+          BoxDecoration(
+            border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+          );
+    }
+
+    if (isSelected) {
+      return widget.pickerDecoration?.pickerTheme?.selectedDecoration ??
+          BoxDecoration(
+            border: Border.all(color: Theme.of(context).primaryColor),
+          );
+    }
+
+    return widget.pickerDecoration?.pickerTheme?.unSelectedDecoration ??
+        BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(color: Colors.grey[300]!),
+        );
+  }
+
+  /*BoxDecoration monthDecoration(bool isSelected, bool isFocused, bool isCurrentMonth,bool isDisabled,) {
     // Disabled state highest priority for decoration
     if (isDisabled) {
       return widget.pickerDecoration?.pickerTheme?.disableDecoration ??
@@ -445,5 +479,5 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         );
-  }
+  }*/
 }
