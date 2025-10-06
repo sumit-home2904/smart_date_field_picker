@@ -1,3 +1,6 @@
+## 1.1.1
+- initial date bug fixed
+
 ## 1.1.0
 - Fixed mask validation, initialDate clearing, month enablement, unified styles, overlay positioning, navigation.
 

@@ -129,10 +129,26 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       selectedDate = widget.initialDate!;
       focusSelectedDate = widget.initialDate!;
     } else {
+      dynamic year;
+      dynamic month;
+      dynamic day;
+
+      if (widget.lastDate.isBefore(DateTime.now())) {
+        year = widget.lastDate.year;
+        month = widget.lastDate.month;
+        day = widget.lastDate.day;
+      } else if (widget.firstDate.isBefore(DateTime.now()) &&
+          widget.lastDate.isAfter(DateTime.now())) {
+        year = DateTime.now().year;
+        month = DateTime.now().month;
+        day = DateTime.now().day;
+      } else if (widget.firstDate.isAfter(DateTime.now())) {
+        year = widget.firstDate.year;
+        month = widget.firstDate.month;
+        day = widget.firstDate.day;
+      }
+
       // take only year & month from lastDate, and set to last day of that month
-      final year = widget.lastDate.year;
-      final month = widget.lastDate.month;
-      final day = widget.lastDate.day;
       final lastDay = DateTime(year, month, day); // gives last day of month
       _currentDisplayDate = lastDay;
       selectedDate = lastDay;
