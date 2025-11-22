@@ -1,3 +1,6 @@
+## 1.1.2
+- Day name issue fixed
+
 ## 1.1.1
 - initial date bug fixed
 

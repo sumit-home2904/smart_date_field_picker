@@ -668,6 +668,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   Widget _buildCalendar() {
     final calendarDays = _generateCalendarDates();
 
+    // print(calendarDays);
+
     focusSelectedDate = DateTime(
       _currentDisplayDate.year,
       _currentDisplayDate.month,
@@ -1012,7 +1014,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: List.generate(7, (index) {
-          String weekday = DateFormat('E').format(DateTime(2021, 1, 4 + index));
+          // Start from Sunday (3 Jan 2021 = Sunday)
+          String weekday = DateFormat('E').format(DateTime(2021, 1, 3 + index));
           return Expanded(
             child: Center(
               child: Text(
@@ -1026,6 +1029,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       ),
     );
   }
+
 
   /// Generates the calendar grid dates based on [focusSelectedDate].
   /// Includes leading and trailing days to complete full weeks.
