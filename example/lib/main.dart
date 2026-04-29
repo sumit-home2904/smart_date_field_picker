@@ -34,30 +34,30 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  DateTime? initDate;
+  List<DateTime?> initDate = List.generate(20, (index) => null);
   final _form = GlobalKey<FormState>();
-  OverlayPortalController controller = OverlayPortalController();
+  List<OverlayPortalController> controller = List.generate(20, (index) => OverlayPortalController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Form(
         key: _form,
-        child: Column(
-          children: [
-            Expanded(
-              child: SmartDateFieldPicker(
-                pickerDecoration: PickerDecoration(width: 270),
-                initialDate: initDate,
-                controller: controller,
-                onDateSelected: (value) {
-                  setState(() {
-                    initDate = value ?? DateTime.now();
-                  });
-                },
-              ),
-            ),
-          ],
+        child: ListView.builder(
+          itemCount: 20,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            return SmartDateFieldPicker(
+              pickerDecoration: PickerDecoration(width: 270),
+              initialDate: initDate[index],
+              controller: controller[index],
+              onDateSelected: (value) {
+                setState(() {
+                  initDate[index] = value ?? DateTime.now();
+                });
+              },
+            );
+          },
         ),
       ),
     );

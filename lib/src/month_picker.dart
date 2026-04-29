@@ -6,6 +6,7 @@ import 'package:smart_date_field_picker/smart_date_field_picker.dart';
 class MyMonthPicker extends StatefulWidget {
   final DateTime currentDisplayDate;
   final DateTime lastDate;
+  final DateTime firstDate;
   final Function() changeToYearPicker;
   final Function(DateTime value) onDateChanged;
   final PickerDecoration? pickerDecoration;
@@ -15,6 +16,7 @@ class MyMonthPicker extends StatefulWidget {
   const MyMonthPicker({
     required this.width,
     required this.lastDate,
+    required this.firstDate,
     required this.height,
     this.pickerDecoration,
     required this.onDateChanged,
@@ -82,24 +84,18 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
   /// 2) Do not allow months after widget.lastDate (month-year inclusive)
   /// 3) Ensure the requested day exists in that month
   bool _isDisabledMonth(DateTime monthDate) {
-    if (widget.currentDisplayDate.year < widget.lastDate.year) {
-      return false;
-    } else {
-      final monthNum = monthDate.month;
-      final year = monthDate.year;
+    final year = monthDate.year;
+    final monthNum = monthDate.month;
 
-      // Rule 1: month must be <= currentDisplayDate.month
-      if (monthNum > widget.lastDate.month) return true;
+    // Check if before firstDate (month-year)
+    if (year < widget.firstDate.year) return true;
+    if (year == widget.firstDate.year && monthNum < widget.firstDate.month) return true;
 
-      // Rule 2: if month-year is after lastDate's month-year -> disabled
-      if (year > widget.lastDate.year) return true;
+    // Check if after lastDate (month-year)
+    if (year > widget.lastDate.year) return true;
+    if (year == widget.lastDate.year && monthNum > widget.lastDate.month) return true;
 
-      if (year == widget.lastDate.year && monthNum > widget.lastDate.month) {
-        return true;
-      }
-
-      return false;
-    }
+    return false;
   }
 
   bool _isMonthEnabled(int index) {

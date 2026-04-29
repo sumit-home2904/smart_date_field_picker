@@ -1,3 +1,8 @@
+## 1.1.3
+- Fixed overlay width constraint issue taking full screen width.
+- Enabled background scrolling while the picker is open.
+- Improved outside tap detection to close the picker.
+
 ## 1.1.2
 - Day name issue fixed
 

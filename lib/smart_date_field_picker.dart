@@ -154,12 +154,21 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
     }
   }
 
+  void _focusListener() {
+    if (!focusNode.hasFocus) {
+      try {
+        _trySetDateFromText();
+      } catch (_) {}
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     // focusNode: either use provided or create one we own
     focusNode = widget.focusNode ?? FocusNode();
+    focusNode.addListener(_focusListener);
 
     // Setup mask formatter with initial text (if any)
     if (widget.initialDate != null) {
@@ -225,6 +234,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
 
   @override
   void dispose() {
+    focusNode.removeListener(_focusListener);
     try {
       textController.dispose();
     } catch (_) {}
@@ -254,20 +264,28 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
 
       // Normalize parsed to a DateTime with zeroed time (optional)
       final parsedDate = DateTime(parsed.year, parsed.month, parsed.day);
+      final firstDateOnly = DateTime(firstDate.year, firstDate.month, firstDate.day);
+      final lastDateOnly = DateTime(lastDate.year, lastDate.month, lastDate.day);
 
-      // Range checks (if you want inclusive bounds)
-      if (parsedDate.isBefore(firstDate)) {
-        // Too early
-        textController.clear();
-        widget.onDateSelected(null);
-        throw 'Selected date is earlier than allowed. Minimum allowed date: ${DateFormat('dd/MM/yyyy').format(firstDate)}';
+      // Range checks (clamping to allowed bounds)
+      if (parsedDate.isBefore(firstDateOnly)) {
+        final newText = DateFormat('dd/MM/yyyy').format(firstDateOnly);
+        textController.text = newText;
+        textController.selection = TextSelection.collapsed(offset: newText.length);
+        maskFormatter = _createMask(initialText: newText);
+        widget.onDateSelected(firstDateOnly);
+        if (!widget.readOnly) widget.controller.hide();
+        return;
       }
 
-      if (parsedDate.isAfter(lastDate)) {
-        // Too late
-        textController.clear();
-        widget.onDateSelected(null);
-        throw 'Selected date is later than allowed. Maximum allowed date: ${DateFormat('dd/MM/yyyy').format(lastDate)} — you cannot select a date beyond this.';
+      if (parsedDate.isAfter(lastDateOnly)) {
+        final newText = DateFormat('dd/MM/yyyy').format(lastDateOnly);
+        textController.text = newText;
+        textController.selection = TextSelection.collapsed(offset: newText.length);
+        maskFormatter = _createMask(initialText: newText);
+        widget.onDateSelected(lastDateOnly);
+        if (!widget.readOnly) widget.controller.hide();
+        return;
       }
 
       // If valid, update controller text (to normalized form) and notify parent
@@ -289,64 +307,53 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
       }
     } on FormatException catch (_) {
       // Parsing failed (invalid date)
-      textController.clear();
-      widget.onDateSelected(null);
-
-      rethrow;
       // Do not clear — let user correct input
     } catch (e) {
       // Generic fallback error, show brief message
-      textController.clear();
-      widget.onDateSelected(null);
-      rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return OverlayPortal(
-      controller: widget.controller,
-      overlayChildBuilder: (context) {
-        final RenderBox? textRenderBox =
-            textFieldKey.currentContext?.findRenderObject() as RenderBox?;
-
-        return GestureDetector(
-          onTap: () {
-            // if(textController.text.isEmpty){
-            //   textController.clear();
-            //   widget.onDateSelected(null);
-            // }
-            // Tapping outside should close the dropdown.
-            widget.controller.hide();
-          },
-          child: Container(
-            color: Colors.transparent,
-            child: Stack(
-              children: [
-                OverlayBuilder(
-                  key: contentKey,
-                  layerLink: layerLink,
-                  renderBox: textRenderBox,
-                  lastDate: lastDate,
-                  firstDate: firstDate,
-                  controller: widget.controller,
-                  textController: textController,
-                  initialDate: widget.initialDate,
-                  dropdownOffset: widget.dropdownOffset,
-                  pickerDecoration: widget.pickerDecoration,
-                  onDateSelected: (value) {
-                    widget.onDateSelected(value);
-                    if (!widget.readOnly) {
-                      widget.controller.hide();
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
+    return TapRegion(
+      groupId: this,
+      onTapOutside: (event) {
+        if (widget.controller.isShowing) {
+          widget.controller.hide();
+        }
       },
-      child: CompositedTransformTarget(
+      child: OverlayPortal(
+        controller: widget.controller,
+        overlayChildBuilder: (context) {
+          final RenderBox? textRenderBox =
+              textFieldKey.currentContext?.findRenderObject() as RenderBox?;
+
+          return Align(
+            alignment: Alignment.topLeft,
+            child: TapRegion(
+              groupId: this,
+              child: OverlayBuilder(
+                key: contentKey,
+                layerLink: layerLink,
+                renderBox: textRenderBox,
+                lastDate: lastDate,
+                firstDate: firstDate,
+                controller: widget.controller,
+                textController: textController,
+                initialDate: widget.initialDate,
+                dropdownOffset: widget.dropdownOffset,
+                pickerDecoration: widget.pickerDecoration,
+                onDateSelected: (value) {
+                  widget.onDateSelected(value);
+                  if (!widget.readOnly) {
+                    widget.controller.hide();
+                  }
+                },
+              ),
+            ),
+          );
+        },
+        child: CompositedTransformTarget(
         link: layerLink,
         child: Listener(
           onPointerDown: (PointerDownEvent event) {
@@ -379,16 +386,10 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
 
               // For mask '##/##/####' we expect 8 digits (ddmmyyyy)
               if (unmasked.length == 8) {
-                // _trySetDateFromText() in your code throws on invalid input.
                 // Catch exceptions here to avoid uncaught exceptions while typing.
                 try {
                   _trySetDateFromText();
                 } catch (_) {}
-              }
-
-              if (value.isEmpty) {
-                textController.clear();
-                widget.onDateSelected(null);
               }
             },
             style: widget.pickerDecoration?.textStyle,
@@ -429,6 +430,7 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
           ),
         ),
       ),
+    ),
     );
   }
 
