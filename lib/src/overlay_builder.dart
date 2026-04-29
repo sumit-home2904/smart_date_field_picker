@@ -135,8 +135,10 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final first = DateTime(widget.firstDate.year, widget.firstDate.month, widget.firstDate.day);
-      final last = DateTime(widget.lastDate.year, widget.lastDate.month, widget.lastDate.day);
+      final first = DateTime(
+          widget.firstDate.year, widget.firstDate.month, widget.firstDate.day);
+      final last = DateTime(
+          widget.lastDate.year, widget.lastDate.month, widget.lastDate.day);
 
       if (last.isBefore(today)) {
         year = widget.lastDate.year;
@@ -679,9 +681,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
       _currentDisplayDate.month,
       focusSelectedDate.day,
     );
-    
-    final firstDateOnly = DateTime(widget.firstDate.year, widget.firstDate.month, widget.firstDate.day);
-    final lastDateOnly = DateTime(widget.lastDate.year, widget.lastDate.month, widget.lastDate.day);
+
+    final firstDateOnly = DateTime(
+        widget.firstDate.year, widget.firstDate.month, widget.firstDate.day);
+    final lastDateOnly = DateTime(
+        widget.lastDate.year, widget.lastDate.month, widget.lastDate.day);
 
     final currentIndex = calendarDays.indexWhere((d) {
       return DateFormat('yyyy-MM-dd').format(d) ==
@@ -871,8 +875,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
                     date.day == selectedDate.day;
 
                 // NEW: consider date disabled if outside allowed range
-                final bool isDisabled = date.isBefore(firstDateOnly) ||
-                    date.isAfter(lastDateOnly);
+                final bool isDisabled =
+                    date.isBefore(firstDateOnly) || date.isAfter(lastDateOnly);
 
                 // Focus logic: only show focus if this date is the focused date AND it's not disabled
                 final isFocusDate = !isDisabled &&
@@ -1035,7 +1039,6 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     );
   }
 
-
   /// Generates the calendar grid dates based on [focusSelectedDate].
   /// Includes leading and trailing days to complete full weeks.
   List<DateTime> _generateCalendarDates() {
@@ -1077,9 +1080,11 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   /// Checks if the given [date] is within the allowed [firstDate] and [lastDate] range.
   bool _isValidDate(DateTime date) {
     final dateOnly = DateTime(date.year, date.month, date.day);
-    final firstDateOnly = DateTime(widget.firstDate.year, widget.firstDate.month, widget.firstDate.day);
-    final lastDateOnly = DateTime(widget.lastDate.year, widget.lastDate.month, widget.lastDate.day);
-    
+    final firstDateOnly = DateTime(
+        widget.firstDate.year, widget.firstDate.month, widget.firstDate.day);
+    final lastDateOnly = DateTime(
+        widget.lastDate.year, widget.lastDate.month, widget.lastDate.day);
+
     if (dateOnly.isBefore(firstDateOnly)) {
       return false;
     }

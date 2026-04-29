@@ -89,11 +89,13 @@ class _MyMonthPickerState extends State<MyMonthPicker> {
 
     // Check if before firstDate (month-year)
     if (year < widget.firstDate.year) return true;
-    if (year == widget.firstDate.year && monthNum < widget.firstDate.month) return true;
+    if (year == widget.firstDate.year && monthNum < widget.firstDate.month)
+      return true;
 
     // Check if after lastDate (month-year)
     if (year > widget.lastDate.year) return true;
-    if (year == widget.lastDate.year && monthNum > widget.lastDate.month) return true;
+    if (year == widget.lastDate.year && monthNum > widget.lastDate.month)
+      return true;
 
     return false;
   }

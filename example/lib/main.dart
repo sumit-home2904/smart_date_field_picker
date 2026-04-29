@@ -36,7 +36,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<DateTime?> initDate = List.generate(20, (index) => null);
   final _form = GlobalKey<FormState>();
-  List<OverlayPortalController> controller = List.generate(20, (index) => OverlayPortalController());
+  List<OverlayPortalController> controller = List.generate(
+    20,
+    (index) => OverlayPortalController(),
+  );
 
   @override
   Widget build(BuildContext context) {

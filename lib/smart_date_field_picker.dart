@@ -264,14 +264,17 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
 
       // Normalize parsed to a DateTime with zeroed time (optional)
       final parsedDate = DateTime(parsed.year, parsed.month, parsed.day);
-      final firstDateOnly = DateTime(firstDate.year, firstDate.month, firstDate.day);
-      final lastDateOnly = DateTime(lastDate.year, lastDate.month, lastDate.day);
+      final firstDateOnly =
+          DateTime(firstDate.year, firstDate.month, firstDate.day);
+      final lastDateOnly =
+          DateTime(lastDate.year, lastDate.month, lastDate.day);
 
       // Range checks (clamping to allowed bounds)
       if (parsedDate.isBefore(firstDateOnly)) {
         final newText = DateFormat('dd/MM/yyyy').format(firstDateOnly);
         textController.text = newText;
-        textController.selection = TextSelection.collapsed(offset: newText.length);
+        textController.selection =
+            TextSelection.collapsed(offset: newText.length);
         maskFormatter = _createMask(initialText: newText);
         widget.onDateSelected(firstDateOnly);
         if (!widget.readOnly) widget.controller.hide();
@@ -281,7 +284,8 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
       if (parsedDate.isAfter(lastDateOnly)) {
         final newText = DateFormat('dd/MM/yyyy').format(lastDateOnly);
         textController.text = newText;
-        textController.selection = TextSelection.collapsed(offset: newText.length);
+        textController.selection =
+            TextSelection.collapsed(offset: newText.length);
         maskFormatter = _createMask(initialText: newText);
         widget.onDateSelected(lastDateOnly);
         if (!widget.readOnly) widget.controller.hide();
@@ -354,83 +358,83 @@ class SmartDateFieldPickerState extends State<SmartDateFieldPicker> {
           );
         },
         child: CompositedTransformTarget(
-        link: layerLink,
-        child: Listener(
-          onPointerDown: (PointerDownEvent event) {
-            // Disable typing on right-click (secondary mouse button).
-            if (event.buttons == kSecondaryMouseButton) {
-              setState(() {
-                isTypingDisabled = true;
-              });
-            } else {
-              setState(() {
-                isTypingDisabled = false;
-              });
-            }
-          },
-          child: TextFormField(
-            key: textFieldKey,
-            enabled: widget.enabled,
-            controller: textController,
-            validator: widget.validator,
-            focusNode: widget.focusNode,
-            onTap: () => textFiledOnTap(),
-            inputFormatters: [maskFormatter],
-            keyboardType: TextInputType.number,
-            onChanged: (value) {
-              // Always try to open dropdown when user types
-              dropDownOpen();
-
-              // Get unmasked value (only digits)
-              final unmasked = maskFormatter.getUnmaskedText();
-
-              // For mask '##/##/####' we expect 8 digits (ddmmyyyy)
-              if (unmasked.length == 8) {
-                // Catch exceptions here to avoid uncaught exceptions while typing.
-                try {
-                  _trySetDateFromText();
-                } catch (_) {}
+          link: layerLink,
+          child: Listener(
+            onPointerDown: (PointerDownEvent event) {
+              // Disable typing on right-click (secondary mouse button).
+              if (event.buttons == kSecondaryMouseButton) {
+                setState(() {
+                  isTypingDisabled = true;
+                });
+              } else {
+                setState(() {
+                  isTypingDisabled = false;
+                });
               }
             },
-            style: widget.pickerDecoration?.textStyle,
-            onSaved: (newValue) {
-              maskFormatter = MaskTextInputFormatter(
-                  mask: '##/##/####',
-                  filter: {"#": RegExp(r'[0-9]')},
-                  type: MaskAutoCompletionType.lazy,
-                  initialText: textController.text);
-              setState(() {});
-            },
-            onFieldSubmitted: (value) {
-              widget.controller.hide();
-              // When user presses Enter / Submit on keyboard
-              _trySetDateFromText();
-            },
-            onEditingComplete: () {
-              widget.controller.hide();
-              // Called when editing finishes (also handle same behavior)
-              _trySetDateFromText();
-            },
-            autovalidateMode: widget.autoValidateMode,
-            showCursor: widget.pickerDecoration?.showCursor,
-            cursorHeight: widget.pickerDecoration?.cursorHeight,
-            cursorRadius: widget.pickerDecoration?.cursorRadius,
-            cursorWidth: widget.pickerDecoration?.cursorWidth ?? 2.0,
-            decoration: widget.decoration ?? const InputDecoration(),
-            textAlign: widget.pickerDecoration?.textAlign ?? TextAlign.start,
-            cursorColor: widget.pickerDecoration?.cursorColor ?? Colors.black,
-            readOnly: isTypingDisabled
-                ? true
-                : widget.fieldReadOnly ?? widget.readOnly,
-            cursorErrorColor:
-                widget.pickerDecoration?.cursorErrorColor ?? Colors.black,
-            enableInteractiveSelection:
-                widget.pickerDecoration?.enableInteractiveSelection ??
-                    (!(widget.fieldReadOnly ?? false)),
+            child: TextFormField(
+              key: textFieldKey,
+              enabled: widget.enabled,
+              controller: textController,
+              validator: widget.validator,
+              focusNode: widget.focusNode,
+              onTap: () => textFiledOnTap(),
+              inputFormatters: [maskFormatter],
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                // Always try to open dropdown when user types
+                dropDownOpen();
+
+                // Get unmasked value (only digits)
+                final unmasked = maskFormatter.getUnmaskedText();
+
+                // For mask '##/##/####' we expect 8 digits (ddmmyyyy)
+                if (unmasked.length == 8) {
+                  // Catch exceptions here to avoid uncaught exceptions while typing.
+                  try {
+                    _trySetDateFromText();
+                  } catch (_) {}
+                }
+              },
+              style: widget.pickerDecoration?.textStyle,
+              onSaved: (newValue) {
+                maskFormatter = MaskTextInputFormatter(
+                    mask: '##/##/####',
+                    filter: {"#": RegExp(r'[0-9]')},
+                    type: MaskAutoCompletionType.lazy,
+                    initialText: textController.text);
+                setState(() {});
+              },
+              onFieldSubmitted: (value) {
+                widget.controller.hide();
+                // When user presses Enter / Submit on keyboard
+                _trySetDateFromText();
+              },
+              onEditingComplete: () {
+                widget.controller.hide();
+                // Called when editing finishes (also handle same behavior)
+                _trySetDateFromText();
+              },
+              autovalidateMode: widget.autoValidateMode,
+              showCursor: widget.pickerDecoration?.showCursor,
+              cursorHeight: widget.pickerDecoration?.cursorHeight,
+              cursorRadius: widget.pickerDecoration?.cursorRadius,
+              cursorWidth: widget.pickerDecoration?.cursorWidth ?? 2.0,
+              decoration: widget.decoration ?? const InputDecoration(),
+              textAlign: widget.pickerDecoration?.textAlign ?? TextAlign.start,
+              cursorColor: widget.pickerDecoration?.cursorColor ?? Colors.black,
+              readOnly: isTypingDisabled
+                  ? true
+                  : widget.fieldReadOnly ?? widget.readOnly,
+              cursorErrorColor:
+                  widget.pickerDecoration?.cursorErrorColor ?? Colors.black,
+              enableInteractiveSelection:
+                  widget.pickerDecoration?.enableInteractiveSelection ??
+                      (!(widget.fieldReadOnly ?? false)),
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 
